@@ -1,0 +1,101 @@
+.site-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.header-container {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+/* Logo */
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Navigation */
+.main-navigation {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.main-navigation a {
+    text-decoration: none;
+    color: #4b5563;
+}
+
+/* Header buttons */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Hero */
+.hero-section {
+    padding: 90px 0;
+}
+
+.hero-content {
+    max-width: 720px;
+}
+.color-section {
+    padding: 80px 0;
+    background-color: #f8f9fb;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.color-card {
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.color-swatch {
+    height: 150px;
+}
+
+.color-blue {
+    background-color: #3B82F6;
+}
+
+.color-green {
+    background-color: #22C55E;
+}
+
+.color-beige {
+    background-color: #D6C2A5;
+}
+
+.color-white {
+    background-color: #F8FAFC;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.color-card h3 {
+    margin: 18px 20px 4px;
+    color: #111827;
+    font-size: 1.1rem;
+}
+
+.color-card p {
+    margin: 0 20px 20px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,29 @@
+@media (max-width: 768px) {
+
+    .header-container {
+        flex-wrap: wrap;
+        padding: 14px 0;
+    }
+
+    .main-navigation {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-section {
+        padding: 60px 0;
+    }
+
+    .hero-content h1 {
+        font-size: 2.4rem;
+    }
+
+    .hero-actions {
+        flex-wrap: wrap;
+    }
+    .color-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+}
