@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Room | Smart Paint</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
     <main>
@@ -14,13 +17,16 @@
             <p>
                 Upload a clear JPG or PNG image of your room.
             </p>
-            <form >
+            <form id="upload-form" name="uploadForm">
                 <label for="room-image">Choose Room Image</label>
                 <input type="file" id="room-image" name="roomImage" accept="image/jpeg,image/png">
+                <div id="image-preview" class="image-preview"></div>
+                <p id="upload-error" class="upload-error"></p>
                 <p>Upload only images that your own or have permission to use.</p>
                 <button type="submit">Continue</button>
             </form>
         </section>
     </main>
+    <script src="../js/upload.js"></script>
 </body>
 </html>
