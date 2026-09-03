@@ -29,9 +29,22 @@
             </p>
 
             <div class="canvas-container">
+             <div class="canvas-tools">
 
+              <button type="button" id="start-selection">
+              Start Selection
+              </button>
+
+              <button type="button" id="clear-selection">
+                 Clear Selection
+             </button>
+
+              </div>   
+              <p id="selection-status">
+                Click "Start Selection" to select a wall area.
+              </p>     
                 <canvas
-                    id="wallCanvas"
+                    id="wallCanvas" 
                     aria-label="Room wall selection area"
                 >
                 </canvas>

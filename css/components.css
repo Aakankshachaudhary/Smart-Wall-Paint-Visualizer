@@ -117,3 +117,22 @@
     min-height: 20px;
     margin-top: 10px;
 }
+.canvas-tools {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.canvas-tools button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#selection-status {
+    text-align: center;
+    margin: 0 0 15px;
+}
