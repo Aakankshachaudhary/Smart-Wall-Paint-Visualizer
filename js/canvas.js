@@ -33,6 +33,28 @@ const paintOpacityInput =
 const opacityValue =
     document.getElementById("opacity-value");
 
+const colorOptions = 
+    document.querySelectorAll(".color-option");
+   
+colorOptions.forEach(function (option) {
+
+    option.addEventListener("click", function () {
+
+        const selectedColor =
+            option.dataset.color;
+
+        paintColorInput.value =
+            selectedColor;
+
+        colorOptions.forEach(function (item) {
+            item.classList.remove("active");
+        });
+
+        option.classList.add("active");
+    });
+
+});
+
 paintOpacityInput.addEventListener("input", function () {
     opacityValue.textContent =
         paintOpacityInput.value + "%";
@@ -41,6 +63,8 @@ paintOpacityInput.addEventListener("input", function () {
         paintWall(paintColorInput.value);
     }
 });
+
+
 
 let isSelecting = false;
 let selectedPoints = [];
@@ -128,7 +152,7 @@ clearSelectionButton.addEventListener("click", function () {
     redrawCanvas();
 
     selectionStatus.textContent =
-        'Selection cleared. Click "Start Selection" to begin again.';
+    "Selection cleared and paint removed. Click \"Start Selection\" to begin again.";
 });
 
 finishSelectionButton.addEventListener("click", function () {
@@ -239,6 +263,7 @@ function paintWall(color) {
         canvas.width,
         canvas.height
     );
+
 
     ctx.restore();
 

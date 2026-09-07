@@ -155,3 +155,33 @@
     cursor: pointer;
     font-weight: 600;
 }
+.color-palette {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.palette-label {
+    font-weight: 600;
+}
+
+.color-option {
+    width: 34px;
+    height: 34px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+}
+
+.color-option:hover {
+    transform: scale(1.08);
+}
+
+.color-option.active {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+}
