@@ -18,6 +18,12 @@ const finishSelectionButton =
 const selectionStatus =
     document.getElementById("selection-status");
 
+const paintColorInput =
+    document.getElementById("paint-color");
+
+const applyPaintButton =
+    document.getElementById("apply-paint");
+
 let isSelecting = false;
 let selectedPoints = [];
 
@@ -166,4 +172,56 @@ function drawSelection(closePath = false) {
     ctx.strokeStyle = "#2563eb";
     ctx.lineWidth = 3;
     ctx.stroke();
+}
+applyPaintButton.addEventListener("click", function () {
+    if (selectedPoints.length < 3) {
+        selectionStatus.textContent =
+            "Please select at least 3 points first.";
+
+        return;
+    }
+
+    const paintColor = paintColorInput.value;
+
+    paintWall(paintColor);
+
+    selectionStatus.textContent =
+        "Paint colour applied successfully.";
+});
+function paintWall(color) {
+    redrawCanvas();
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        selectedPoints[0].x,
+        selectedPoints[0].y
+    );
+
+    for (let i = 1; i < selectedPoints.length; i++) {
+        ctx.lineTo(
+            selectedPoints[i].x,
+            selectedPoints[i].y
+        );
+    }
+
+    ctx.closePath();
+
+    ctx.clip();
+
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.5;
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.restore();
+
+    drawSelection(true);
 }
