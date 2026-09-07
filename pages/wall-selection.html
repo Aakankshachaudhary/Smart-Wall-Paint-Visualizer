@@ -54,19 +54,36 @@
                 </button>
 
             </div>
-            <div class="paint-controls">
-               <label for="paint-color">Paint Colour:</label>
 
-               <input
-                type="color"
-                id="paint-color"
-                 value="#4f46e5"
-                >
+        <div class="paint-controls">
+            <label for="paint-color">Paint Colour:</label>
 
-            <button type="button" id="apply-paint">
-              Apply Paint
-            </button>
-            </div>
+           <input
+           type="color"
+           id="paint-color"
+           value="#4f46e5"
+           >
+
+          <label for="paint-opacity">Opacity:</label>
+
+          <input
+          type="range"
+          id="paint-opacity"
+          min="10"
+          max="100"
+          value="70"
+          >
+
+          <span id="opacity-value">70%</span>
+
+          <button type="button" id="apply-paint">
+           Apply Paint
+          </button>
+
+          <button type="button" id="reset-paint">
+           Reset Paint
+          </button>
+        </div>
 
                 <p id="selection-status">
                     Click "Start Selection" to select a wall area.

@@ -24,6 +24,24 @@ const paintColorInput =
 const applyPaintButton =
     document.getElementById("apply-paint");
 
+const resetPaintButton =
+    document.getElementById("reset-paint");
+
+const paintOpacityInput =
+    document.getElementById("paint-opacity");
+
+const opacityValue =
+    document.getElementById("opacity-value");
+
+paintOpacityInput.addEventListener("input", function () {
+    opacityValue.textContent =
+        paintOpacityInput.value + "%";
+
+    if (selectedPoints.length >= 3) {
+        paintWall(paintColorInput.value);
+    }
+});
+
 let isSelecting = false;
 let selectedPoints = [];
 
@@ -212,7 +230,8 @@ function paintWall(color) {
     ctx.clip();
 
     ctx.fillStyle = color;
-    ctx.globalAlpha = 0.5;
+   ctx.globalAlpha =
+    Number(paintOpacityInput.value) / 100;
 
     ctx.fillRect(
         0,
@@ -225,3 +244,9 @@ function paintWall(color) {
 
     drawSelection(true);
 }
+resetPaintButton.addEventListener("click", function () {
+    redrawCanvas(true);
+
+    selectionStatus.textContent =
+        "Paint reset. Your wall selection is still active.";
+});
