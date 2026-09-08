@@ -185,3 +185,63 @@
     outline: 3px solid #2563eb;
     outline-offset: 2px;
 }
+
+.canvas-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#wallCanvas {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    margin: 0 auto;
+}
+
+.canvas-tools {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.selection-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px auto;
+    flex-wrap: wrap;
+}
+
+#selection-status {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.design-palette {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.design-option {
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.design-option:hover {
+    border-color: #2563eb;
+}
+
+.design-option.active {
+    border-color: #2563eb;
+    background-color: #2563eb;
+    color: #ffffff;
+}

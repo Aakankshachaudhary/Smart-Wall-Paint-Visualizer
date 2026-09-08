@@ -1,7 +1,7 @@
 const canvas = document.getElementById("wallCanvas");
 const ctx = canvas.getContext("2d");
 
-const roomImage = sessionStorage.getItem("roomImage");
+const roomImage = getRoomImage();
 
 const startSelectionButton =
     document.getElementById("start-selection");
@@ -18,8 +18,6 @@ const finishSelectionButton =
 const selectionStatus =
     document.getElementById("selection-status");
 
-const paintColorInput =
-    document.getElementById("paint-color");
 
 const applyPaintButton =
     document.getElementById("apply-paint");
@@ -32,28 +30,6 @@ const paintOpacityInput =
 
 const opacityValue =
     document.getElementById("opacity-value");
-
-const colorOptions = 
-    document.querySelectorAll(".color-option");
-   
-colorOptions.forEach(function (option) {
-
-    option.addEventListener("click", function () {
-
-        const selectedColor =
-            option.dataset.color;
-
-        paintColorInput.value =
-            selectedColor;
-
-        colorOptions.forEach(function (item) {
-            item.classList.remove("active");
-        });
-
-        option.classList.add("active");
-    });
-
-});
 
 paintOpacityInput.addEventListener("input", function () {
     opacityValue.textContent =
@@ -231,6 +207,7 @@ applyPaintButton.addEventListener("click", function () {
         "Paint colour applied successfully.";
 });
 function paintWall(color) {
+
     redrawCanvas();
 
     ctx.save();
@@ -243,6 +220,7 @@ function paintWall(color) {
     );
 
     for (let i = 1; i < selectedPoints.length; i++) {
+
         ctx.lineTo(
             selectedPoints[i].x,
             selectedPoints[i].y
@@ -253,25 +231,81 @@ function paintWall(color) {
 
     ctx.clip();
 
-    ctx.fillStyle = color;
-   ctx.globalAlpha =
-    Number(paintOpacityInput.value) / 100;
+    ctx.globalAlpha =
+        Number(paintOpacityInput.value) / 100;
 
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+    if (selectedDesign === "solid") {
 
+        ctx.fillStyle = color;
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
+    if (selectedDesign === "vertical-stripes") {
+
+        ctx.fillStyle = color;
+
+        for (let x = 0; x < canvas.width; x += 40) {
+
+            ctx.fillRect(
+                x,
+                0,
+                20,
+                canvas.height
+            );
+        }
+
+    }
+
+    if (selectedDesign === "horizontal-stripes") {
+
+        ctx.fillStyle = color;
+
+        for (let y = 0; y < canvas.height; y += 40) {
+
+            ctx.fillRect(
+                0,
+                y,
+                canvas.width,
+                20
+            );
+        }
+
+    }
+
+    if (selectedDesign === "grid") {
+
+        ctx.fillStyle = color;
+
+        for (let x = 0; x < canvas.width; x += 40) {
+
+            ctx.fillRect(
+                x,
+                0,
+                20,
+                canvas.height
+            );
+        }
+
+        for (let y = 0; y < canvas.height; y += 40) {
+
+            ctx.fillRect(
+                0,
+                y,
+                canvas.width,
+                20
+            );
+        }
+
+    }
 
     ctx.restore();
 
     drawSelection(true);
 }
-resetPaintButton.addEventListener("click", function () {
-    redrawCanvas(true);
-
-    selectionStatus.textContent =
-        "Paint reset. Your wall selection is still active.";
-});

@@ -57,7 +57,7 @@ uploadForm.addEventListener("submit", function (event) {
     const reader = new FileReader();
 
     reader.onload = function () {
-        sessionStorage.setItem("roomImage", reader.result);
+        saveRoomImage(reader.result);
 
         window.location.href = "wall-selection.html";
     };
