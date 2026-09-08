@@ -2,94 +2,80 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-      <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/responsive.css">
-    <title>Colour Preview | Smart Paint</title>
+
+    <title>Preview Design</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
 </head>
 
 <body>
+
+    <header class="site-header">
+
+        <h1>Smart Wall Paint Visualizer</h1>
+
+    </header>
 
     <main>
 
         <section class="preview-section">
 
-            <h1>
-                Colour Preview
-            </h1>
+            <h2>Before & After Preview</h2>
 
             <div class="preview-container">
 
-                <div class="before-preview">
+                <div class="preview-card">
 
-                    <h2>
-                        Before
-                    </h2>
+                    <h3>Before</h3>
 
-                    <div id="beforeImage">
-                    </div>
+                    <img
+                        id="before-image"
+                        alt="Original room"
+                    >
 
                 </div>
 
+                <div class="preview-card">
 
-                <div class="after-preview">
+                    <h3>After</h3>
 
-                    <h2>
-                        After
-                    </h2>
-
-                    <div id="afterImage">
-                    </div>
+                    <img
+                        id="after-image"
+                        alt="Painted room"
+                    >
 
                 </div>
 
             </div>
 
-
-            <section class="color-controls">
-
-                <h2>
-                    Choose Colour
-                </h2>
-
-                <div id="colorPalette">
-                </div>
-
-
-                <label for="customColor">
-                    Custom Colour
-                </label>
-
-                <input
-                    type="color"
-                    id="customColor"
-                    value="#4A90E2"
-                >
-
-
-                <label for="opacity">
-                    Opacity
-                </label>
-
-                <input
-                    type="range"
-                    id="opacity"
-                    min="0"
-                    max="100"
-                    value="80"
-                >
-
-            </section>
-
         </section>
 
     </main>
+
+    <script src="../js/storage.js"></script>
+   <script src="../js/app.js"></script>
+
 
 </body>
 

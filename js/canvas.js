@@ -18,12 +18,14 @@ const finishSelectionButton =
 const selectionStatus =
     document.getElementById("selection-status");
 
-
 const applyPaintButton =
     document.getElementById("apply-paint");
 
 const resetPaintButton =
     document.getElementById("reset-paint");
+
+const previewDesignButton =
+    document.getElementById("preview-design");
 
 const paintOpacityInput =
     document.getElementById("paint-opacity");
@@ -192,19 +194,14 @@ function drawSelection(closePath = false) {
     ctx.stroke();
 }
 applyPaintButton.addEventListener("click", function () {
-    if (selectedPoints.length < 3) {
-        selectionStatus.textContent =
-            "Please select at least 3 points first.";
 
-        return;
-    }
+    paintWall(paintColorInput.value);
 
-    const paintColor = paintColorInput.value;
+    const paintedImage =
+        canvas.toDataURL("image/png");
 
-    paintWall(paintColor);
+    savePaintedImage(paintedImage);
 
-    selectionStatus.textContent =
-        "Paint colour applied successfully.";
 });
 function paintWall(color) {
 
@@ -309,3 +306,21 @@ function paintWall(color) {
 
     drawSelection(true);
 }
+previewDesignButton.addEventListener("click", function () {
+
+    if (selectedPoints.length < 3) {
+
+        selectionStatus.textContent =
+            "Please select and paint a wall before previewing.";
+
+        return;
+    }
+
+    const paintedImage =
+        canvas.toDataURL("image/png");
+
+    savePaintedImage(paintedImage);
+
+    window.location.href = "preview.html";
+
+});

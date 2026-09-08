@@ -37,4 +37,7 @@
     .selection-controls {
         gap: 8px;
     }
+    .preview-container {
+    grid-template-columns: 1fr;
+}
 }
