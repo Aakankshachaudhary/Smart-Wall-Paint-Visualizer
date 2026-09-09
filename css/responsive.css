@@ -26,9 +26,6 @@
     .color-grid {
     grid-template-columns: repeat(2, 1fr);
 }
-}
-
-@media (max-width: 768px) {
 
     #wallCanvas {
         max-height: 55vh;
@@ -40,4 +37,10 @@
     .preview-container {
     grid-template-columns: 1fr;
 }
+.saved-designs-container {
+    grid-template-columns: 1fr;
 }
+}
+
+
+

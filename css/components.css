@@ -278,3 +278,37 @@
     display: block;
     border-radius: 8px;
 }
+
+.saved-designs-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.saved-designs-section h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.saved-designs-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.saved-design-card {
+    padding: 15px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.saved-design-card img {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+}
+
+.saved-design-card p {
+    margin-top: 10px;
+}

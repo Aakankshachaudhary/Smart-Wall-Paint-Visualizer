@@ -78,6 +78,8 @@ startSelectionButton.addEventListener("click", function () {
     isSelecting = true;
     selectedPoints = [];
 
+    removePaintedImage();
+
     redrawCanvas();
 
     selectionStatus.textContent =
@@ -195,6 +197,14 @@ function drawSelection(closePath = false) {
 }
 applyPaintButton.addEventListener("click", function () {
 
+    if (selectedPoints.length < 3) {
+
+        selectionStatus.textContent =
+            "Please select a wall before applying paint.";
+
+        return;
+    }
+
     paintWall(paintColorInput.value);
 
     const paintedImage =
@@ -202,6 +212,8 @@ applyPaintButton.addEventListener("click", function () {
 
     savePaintedImage(paintedImage);
 
+    selectionStatus.textContent =
+        "Paint applied successfully.";
 });
 function paintWall(color) {
 

@@ -2,43 +2,59 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/responsive.css">
-    <title>Saved Designs | Smart Paint</title>
+
+    <title>Saved Designs</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
 </head>
 
 <body>
+
+    <header class="site-header">
+
+        <h1>Smart Wall Paint Visualizer</h1>
+
+    </header>
 
     <main>
 
         <section class="saved-designs-section">
 
-            <h1>
-                My Saved Designs
-            </h1>
+            <h2>Saved Designs</h2>
 
-            <p>
-                Your saved room designs will appear here.
-            </p>
-
-            <div id="savedDesigns">
-
-                <p>
-                    No saved designs yet.
-                </p>
-
+            <div
+                id="saved-designs-container"
+                class="saved-designs-container"
+            >
             </div>
 
         </section>
 
     </main>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/app.js"></script>
 
 </body>
 
