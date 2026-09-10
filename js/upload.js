@@ -1,56 +1,68 @@
+const uploadForm = document.getElementById("upload-form");
 const imageInput = document.getElementById("room-image");
 const imagePreview = document.getElementById("image-preview");
-const uploadError = document.getElementById("upload-error");
-const uploadForm = document.getElementById("upload-form");
+const uploadMessage = document.getElementById("upload-message");
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+function showUploadMessage(message, type = "") {
+    if (!uploadMessage) return;
+
+    uploadMessage.textContent = message;
+    uploadMessage.className = "upload-message";
+
+    if (type) {
+        uploadMessage.classList.add(type);
+    }
+}
+
+function validateImage(file) {
+    if (!file) {
+        return "Please select an image.";
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        return "Only JPG and PNG images are allowed.";
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        return "Image size must be 5 MB or less.";
+    }
+
+    return "";
+}
 
 imageInput.addEventListener("change", function () {
+    const file = imageInput.files[0];
+    const error = validateImage(file);
 
-    const selectedFile = imageInput.files[0];
-
-    imagePreview.innerHTML = "";
-    uploadError.textContent = "";
-    imagePreview.style.display = "none";
-
-    if (!selectedFile) {
+    if (error) {
+        imagePreview.hidden = true;
+        showUploadMessage(error, "error");
         return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png"];
+    const previewUrl = URL.createObjectURL(file);
 
-    if (!allowedTypes.includes(selectedFile.type)) {
-        uploadError.textContent = "Please select a JPG or PNG image.";
-        imageInput.value = "";
-        return;
-    }
+    imagePreview.onload = function () {
+        URL.revokeObjectURL(previewUrl);
+    };
 
-    const maxSize = 5 * 1024 * 1024;
+    imagePreview.src = previewUrl;
+    imagePreview.hidden = false;
 
-    if (selectedFile.size > maxSize) {
-        uploadError.textContent = "Image size should be less than 5 MB.";
-        imageInput.value = "";
-        return;
-    }
-
-    const imageURL = URL.createObjectURL(selectedFile);
-
-    const image = document.createElement("img");
-
-    image.src = imageURL;
-    image.alt = "Selected room preview";
-
-    imagePreview.appendChild(image);
-    imagePreview.style.display = "block";
+    showUploadMessage("Image is ready to use.", "success");
 });
 
-
 uploadForm.addEventListener("submit", function (event) {
-
     event.preventDefault();
 
-    const selectedFile = imageInput.files[0];
+    const file = imageInput.files[0];
+    const error = validateImage(file);
 
-    if (!selectedFile) {
-        uploadError.textContent = "Please select a room image first.";
+    if (error) {
+        showUploadMessage(error, "error");
         return;
     }
 
@@ -58,9 +70,15 @@ uploadForm.addEventListener("submit", function (event) {
 
     reader.onload = function () {
         saveRoomImage(reader.result);
+        removePaintedImage();
+        removeCurrentDesignMetadata();
 
         window.location.href = "wall-selection.html";
     };
 
-    reader.readAsDataURL(selectedFile);
+    reader.onerror = function () {
+        showUploadMessage("The image could not be processed. Please try again.", "error");
+    };
+
+    reader.readAsDataURL(file);
 });

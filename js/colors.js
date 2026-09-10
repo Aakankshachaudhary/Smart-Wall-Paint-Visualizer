@@ -1,29 +1,23 @@
 const paintColorInput = document.getElementById("paint-color");
-const colorOptions = document.querySelectorAll(".color-option");
+const colorButtons = document.querySelectorAll(".color-option");
 
-colorOptions.forEach(function (option) {
+function setActiveColor(button) {
+    colorButtons.forEach((item) => item.classList.remove("active"));
 
-    option.addEventListener("click", function () {
+    if (button) {
+        button.classList.add("active");
+    }
+}
 
-        const selectedColor =
-            option.dataset.color;
-
-        paintColorInput.value =
-            selectedColor;
-
-        colorOptions.forEach(function (item) {
-            item.classList.remove("active");
-        });
-
-        option.classList.add("active");
+colorButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+        paintColorInput.value = button.dataset.color;
+        setActiveColor(button);
     });
-
 });
 
-paintColorInput.addEventListener("input", function () {
-
-    colorOptions.forEach(function (item) {
-        item.classList.remove("active");
+if (paintColorInput) {
+    paintColorInput.addEventListener("input", function () {
+        setActiveColor(null);
     });
-
-});
+}

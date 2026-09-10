@@ -1,3 +1,4 @@
+// Current room image
 function saveRoomImage(imageData) {
     sessionStorage.setItem("roomImage", imageData);
 }
@@ -9,6 +10,8 @@ function getRoomImage() {
 function removeRoomImage() {
     sessionStorage.removeItem("roomImage");
 }
+
+// Current painted image
 function savePaintedImage(imageData) {
     sessionStorage.setItem("paintedImage", imageData);
 }
@@ -20,189 +23,126 @@ function getPaintedImage() {
 function removePaintedImage() {
     sessionStorage.removeItem("paintedImage");
 }
-const designDBRequest =
-    indexedDB.open("SmartWallPaintDB", 1);
 
-designDBRequest.onupgradeneeded = function (event) {
+// Current design metadata
+function saveCurrentDesignMetadata(metadata) {
+    sessionStorage.setItem("currentDesignMetadata", JSON.stringify(metadata));
+}
 
-    const db = event.target.result;
+function getCurrentDesignMetadata() {
+    const data = sessionStorage.getItem("currentDesignMetadata");
 
-    if (!db.objectStoreNames.contains("designs")) {
-
-        db.createObjectStore("designs", {
-            keyPath: "id",
-            autoIncrement: true
-        });
+    if (!data) {
+        return null;
     }
-};
 
-function saveDesign(design) {
+    try {
+        return JSON.parse(data);
+    } catch (error) {
+        console.error("Could not read current design metadata:", error);
+        return null;
+    }
+}
 
-    return new Promise(function (resolve, reject) {
+function removeCurrentDesignMetadata() {
+    sessionStorage.removeItem("currentDesignMetadata");
+}
 
-        const request =
-            indexedDB.open("SmartWallPaintDB", 1);
+// IndexedDB for saved designs.
+// Images are too large for localStorage, so saved designs use IndexedDB.
+function openDesignDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("SmartWallPaintDB", 1);
 
-        request.onsuccess = function (event) {
-
+        request.onupgradeneeded = function (event) {
             const db = event.target.result;
 
-            const transaction =
-                db.transaction(
-                    ["designs"],
-                    "readwrite"
-                );
+            if (!db.objectStoreNames.contains("designs")) {
+                db.createObjectStore("designs", {
+                    keyPath: "id",
+                    autoIncrement: true
+                });
+            }
+        };
 
-            const store =
-                transaction.objectStore("designs");
-
-            store.add(design);
-
-            transaction.oncomplete = function () {
-
-                db.close();
-                resolve();
-            };
-
-            transaction.onerror = function () {
-
-                db.close();
-                reject(transaction.error);
-            };
+        request.onsuccess = function () {
+            resolve(request.result);
         };
 
         request.onerror = function () {
-
             reject(request.error);
         };
+    });
+}
+
+function saveDesign(design) {
+    return openDesignDatabase().then((db) => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction("designs", "readwrite");
+            const store = transaction.objectStore("designs");
+            const request = store.add(design);
+
+            request.onsuccess = function () {
+                resolve(request.result);
+            };
+
+            request.onerror = function () {
+                reject(request.error);
+            };
+        });
     });
 }
 
 function getSavedDesigns() {
+    return openDesignDatabase().then((db) => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction("designs", "readonly");
+            const store = transaction.objectStore("designs");
+            const request = store.getAll();
 
-    return new Promise(function (resolve, reject) {
-
-        const request =
-            indexedDB.open("SmartWallPaintDB", 1);
-
-        request.onsuccess = function (event) {
-
-            const db = event.target.result;
-
-            const transaction =
-                db.transaction(
-                    ["designs"],
-                    "readonly"
-                );
-
-            const store =
-                transaction.objectStore("designs");
-
-            const getRequest =
-                store.getAll();
-
-            getRequest.onsuccess = function () {
-
-                db.close();
-
-                resolve(getRequest.result);
+            request.onsuccess = function () {
+                resolve(request.result);
             };
 
-            getRequest.onerror = function () {
-
-                db.close();
-
-                reject(getRequest.error);
+            request.onerror = function () {
+                reject(request.error);
             };
-        };
-
-        request.onerror = function () {
-
-            reject(request.error);
-        };
+        });
     });
 }
 
 function deleteSavedDesign(id) {
+    return openDesignDatabase().then((db) => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction("designs", "readwrite");
+            const store = transaction.objectStore("designs");
+            const request = store.delete(id);
 
-    return new Promise(function (resolve, reject) {
-
-        const request =
-            indexedDB.open("SmartWallPaintDB", 1);
-
-        request.onsuccess = function (event) {
-
-            const db = event.target.result;
-
-            const transaction =
-                db.transaction(
-                    ["designs"],
-                    "readwrite"
-                );
-
-            const store =
-                transaction.objectStore("designs");
-
-            store.delete(id);
-
-            transaction.oncomplete = function () {
-
-                db.close();
+            request.onsuccess = function () {
                 resolve();
             };
 
-            transaction.onerror = function () {
-
-                db.close();
-                reject(transaction.error);
+            request.onerror = function () {
+                reject(request.error);
             };
-        };
-
-        request.onerror = function () {
-
-            reject(request.error);
-        };
+        });
     });
 }
 
 function removeSavedDesigns() {
+    return openDesignDatabase().then((db) => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction("designs", "readwrite");
+            const store = transaction.objectStore("designs");
+            const request = store.clear();
 
-    return new Promise(function (resolve, reject) {
-
-        const request =
-            indexedDB.open("SmartWallPaintDB", 1);
-
-        request.onsuccess = function (event) {
-
-            const db = event.target.result;
-
-            const transaction =
-                db.transaction(
-                    ["designs"],
-                    "readwrite"
-                );
-
-            const store =
-                transaction.objectStore("designs");
-
-            store.clear();
-
-            transaction.oncomplete = function () {
-
-                db.close();
+            request.onsuccess = function () {
                 resolve();
             };
 
-            transaction.onerror = function () {
-
-                db.close();
-                reject(transaction.error);
+            request.onerror = function () {
+                reject(request.error);
             };
-        };
-
-        request.onerror = function () {
-
-            reject(request.error);
-        };
+        });
     });
 }

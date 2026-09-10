@@ -42,5 +42,15 @@
 }
 }
 
+@media (max-width: 600px) {
+    .saved-design-actions {
+        flex-direction: column;
+    }
+
+    .saved-design-preview {
+        height: 180px;
+    }
+}
+
 
 

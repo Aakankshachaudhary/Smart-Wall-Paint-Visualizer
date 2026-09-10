@@ -1,338 +1,294 @@
 const canvas = document.getElementById("wallCanvas");
-const ctx = canvas.getContext("2d");
+const context = canvas ? canvas.getContext("2d") : null;
 
-const roomImage = getRoomImage();
+const roomImage = new Image();
 
-const startSelectionButton =
-    document.getElementById("start-selection");
+const startSelectionButton = document.getElementById("start-selection");
+const undoSelectionButton = document.getElementById("undo-selection");
+const clearSelectionButton = document.getElementById("clear-selection");
+const finishSelectionButton = document.getElementById("finish-selection");
+const applyPaintButton = document.getElementById("apply-paint");
+const resetPaintButton = document.getElementById("reset-paint");
+const previewButton = document.getElementById("preview-design");
+const paintOpacityInput = document.getElementById("paint-opacity");
+const opacityValue = document.getElementById("opacity-value");
+const selectionStatus = document.getElementById("selection-status");
 
-const undoSelectionButton =
-    document.getElementById("undo-selection");
-
-const clearSelectionButton =
-    document.getElementById("clear-selection");
-
-const finishSelectionButton =
-    document.getElementById("finish-selection");
-
-const selectionStatus =
-    document.getElementById("selection-status");
-
-const applyPaintButton =
-    document.getElementById("apply-paint");
-
-const resetPaintButton =
-    document.getElementById("reset-paint");
-
-const previewDesignButton =
-    document.getElementById("preview-design");
-
-const paintOpacityInput =
-    document.getElementById("paint-opacity");
-
-const opacityValue =
-    document.getElementById("opacity-value");
-
-paintOpacityInput.addEventListener("input", function () {
-    opacityValue.textContent =
-        paintOpacityInput.value + "%";
-
-    if (selectedPoints.length >= 3) {
-        paintWall(paintColorInput.value);
-    }
-});
-
-
-
-let isSelecting = false;
 let selectedPoints = [];
+let isSelecting = false;
+let isSelectionFinished = false;
 
-const image = new Image();
+function showCanvasStatus(message, type = "") {
+    if (!selectionStatus) return;
 
-image.onload = function () {
+    selectionStatus.textContent = message;
+    selectionStatus.className = "selection-status";
 
-    console.log("Image loaded successfully");
-
-    canvas.width = image.width;
-    canvas.height = image.height;
-
-    ctx.drawImage(image, 0, 0);
-};
-
-image.onerror = function () {
-    console.log("Image could not be loaded");
-};
-
-if (roomImage) {
-
-    image.src = roomImage;
-
-} else {
-
-    console.log("No image found in sessionStorage");
-
+    if (type) {
+        selectionStatus.classList.add(type);
+    }
 }
 
-startSelectionButton.addEventListener("click", function () {
+function setCanvasSize() {
+    if (!roomImage.naturalWidth || !roomImage.naturalHeight) return;
 
-    isSelecting = true;
-    selectedPoints = [];
+    canvas.width = roomImage.naturalWidth;
+    canvas.height = roomImage.naturalHeight;
+}
 
-    removePaintedImage();
+function drawOriginalImage() {
+    if (!context || !canvas) return;
 
-    redrawCanvas();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(roomImage, 0, 0, canvas.width, canvas.height);
+}
 
-    selectionStatus.textContent =
-        "Selection mode is active. Click points around the wall.";
-});
-
-canvas.addEventListener("click", function (event) {
-
-    if (!isSelecting) {
-        return;
-    }
-
+function getCanvasPoint(event) {
     const rect = canvas.getBoundingClientRect();
 
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    return {
+        x: (event.clientX - rect.left) * (canvas.width / rect.width),
+        y: (event.clientY - rect.top) * (canvas.height / rect.height)
+    };
+}
 
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+function createWallPath() {
+    if (selectedPoints.length < 3) return;
 
-    selectedPoints.push({
-        x: x,
-        y: y
-    });
+    context.beginPath();
+    context.moveTo(selectedPoints[0].x, selectedPoints[0].y);
 
-    redrawCanvas();
+    for (let i = 1; i < selectedPoints.length; i++) {
+        context.lineTo(selectedPoints[i].x, selectedPoints[i].y);
+    }
 
-    console.log("Selected point:", x, y);
+    context.closePath();
+}
+
+function drawSelectionOutline() {
+    if (selectedPoints.length === 0) return;
+
+    context.save();
+    context.beginPath();
+    context.moveTo(selectedPoints[0].x, selectedPoints[0].y);
+
+    for (let i = 1; i < selectedPoints.length; i++) {
+        context.lineTo(selectedPoints[i].x, selectedPoints[i].y);
+    }
+
+    context.strokeStyle = "#2563eb";
+    context.lineWidth = Math.max(2, canvas.width / 500);
+    context.setLineDash([8, 6]);
+    context.stroke();
+    context.restore();
+}
+
+function redrawCanvas(showSelection = true) {
+    drawOriginalImage();
+
+    if (showSelection && selectedPoints.length > 0) {
+        drawSelectionOutline();
+    }
+}
+
+function drawVerticalStripes() {
+    const stripeWidth = Math.max(18, canvas.width / 18);
+
+    for (let x = 0; x < canvas.width; x += stripeWidth * 2) {
+        context.fillRect(x, 0, stripeWidth, canvas.height);
+    }
+}
+
+function drawHorizontalStripes() {
+    const stripeHeight = Math.max(18, canvas.height / 18);
+
+    for (let y = 0; y < canvas.height; y += stripeHeight * 2) {
+        context.fillRect(0, y, canvas.width, stripeHeight);
+    }
+}
+
+function drawGrid() {
+    const gridSize = Math.max(30, canvas.width / 12);
+    const lineWidth = Math.max(3, gridSize / 10);
+
+    for (let x = 0; x <= canvas.width; x += gridSize) {
+        context.fillRect(x, 0, lineWidth, canvas.height);
+    }
+
+    for (let y = 0; y <= canvas.height; y += gridSize) {
+        context.fillRect(0, y, canvas.width, lineWidth);
+    }
+}
+
+function drawDesign(design) {
+    if (design === "vertical-stripes") {
+        drawVerticalStripes();
+    } else if (design === "horizontal-stripes") {
+        drawHorizontalStripes();
+    } else if (design === "grid") {
+        drawGrid();
+    } else {
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function paintWall(color, showSelection = true) {
+    if (selectedPoints.length < 3) {
+        showCanvasStatus("Please select the wall first.", "error");
+        return null;
+    }
+
+    const opacity = Number(paintOpacityInput.value) / 100;
+    const design = getSelectedDesign();
+
+    drawOriginalImage();
+
+    context.save();
+    createWallPath();
+    context.clip();
+
+    context.globalAlpha = opacity;
+    context.fillStyle = color;
+    drawDesign(design);
+
+    context.restore();
+
+    if (showSelection) {
+        drawSelectionOutline();
+    }
+
+    return canvas.toDataURL("image/png");
+}
+
+function getCurrentMetadata() {
+    return {
+        color: paintColorInput.value,
+        design: getSelectedDesign(),
+        opacity: Number(paintOpacityInput.value),
+        date: new Date().toLocaleString()
+    };
+}
+
+canvas.addEventListener("click", function (event) {
+    if (!isSelecting) return;
+
+    selectedPoints.push(getCanvasPoint(event));
+    redrawCanvas(true);
+
+    showCanvasStatus(
+        `${selectedPoints.length} point${selectedPoints.length === 1 ? "" : "s"} selected.`
+    );
+});
+
+startSelectionButton.addEventListener("click", function () {
+    selectedPoints = [];
+    isSelecting = true;
+    isSelectionFinished = false;
+
+    removePaintedImage();
+    removeCurrentDesignMetadata();
+    redrawCanvas(true);
+
+    showCanvasStatus("Click around the wall to create your selection.");
 });
 
 undoSelectionButton.addEventListener("click", function () {
-
-    if (selectedPoints.length === 0) {
-        return;
-    }
+    if (selectedPoints.length === 0) return;
 
     selectedPoints.pop();
+    isSelectionFinished = false;
+    redrawCanvas(true);
 
-    redrawCanvas();
-
-    selectionStatus.textContent =
-        "Last selection point removed.";
+    showCanvasStatus(`${selectedPoints.length} point(s) selected.`);
 });
 
 clearSelectionButton.addEventListener("click", function () {
-
     selectedPoints = [];
     isSelecting = false;
+    isSelectionFinished = false;
 
-    redrawCanvas();
+    removePaintedImage();
+    removeCurrentDesignMetadata();
+    redrawCanvas(false);
 
-    selectionStatus.textContent =
-    "Selection cleared and paint removed. Click \"Start Selection\" to begin again.";
+    showCanvasStatus("Wall selection cleared.");
 });
 
 finishSelectionButton.addEventListener("click", function () {
-
     if (selectedPoints.length < 3) {
-
-        selectionStatus.textContent =
-            "Please select at least 3 points to finish the wall.";
-
+        showCanvasStatus("Select at least 3 points before finishing.", "error");
         return;
     }
 
     isSelecting = false;
-
+    isSelectionFinished = true;
     redrawCanvas(true);
 
-    selectionStatus.textContent =
-        "Wall selection completed successfully.";
+    showCanvasStatus("Wall selected successfully.", "success");
 });
 
-function redrawCanvas(closePath = false) {
+paintOpacityInput.addEventListener("input", function () {
+    opacityValue.textContent = `${paintOpacityInput.value}%`;
 
-    if (!image.complete || !image.naturalWidth) {
-        return;
+    if (isSelectionFinished) {
+        paintWall(paintColorInput.value, true);
+    } else {
+        redrawCanvas(true);
     }
+});
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.drawImage(image, 0, 0);
-
-    drawSelection(closePath);
-}
-
-function drawSelection(closePath = false) {
-
-    if (selectedPoints.length === 0) {
-        return;
-    }
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        selectedPoints[0].x,
-        selectedPoints[0].y
-    );
-
-    for (let i = 1; i < selectedPoints.length; i++) {
-
-        ctx.lineTo(
-            selectedPoints[i].x,
-            selectedPoints[i].y
-        );
-    }
-
-    if (closePath) {
-        ctx.closePath();
-    }
-
-    ctx.strokeStyle = "#2563eb";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-}
 applyPaintButton.addEventListener("click", function () {
-
-    if (selectedPoints.length < 3) {
-
-        selectionStatus.textContent =
-            "Please select a wall before applying paint.";
-
+    if (!isSelectionFinished) {
+        showCanvasStatus("Finish the wall selection before applying paint.", "error");
         return;
     }
 
-    paintWall(paintColorInput.value);
+    const paintedImage = paintWall(paintColorInput.value, false);
 
-    const paintedImage =
-        canvas.toDataURL("image/png");
+    if (!paintedImage) return;
 
     savePaintedImage(paintedImage);
+    saveCurrentDesignMetadata(getCurrentMetadata());
 
-    selectionStatus.textContent =
-        "Paint applied successfully.";
+    redrawCanvas(true);
+    showCanvasStatus("Paint applied successfully.", "success");
 });
-function paintWall(color) {
 
-    redrawCanvas();
+resetPaintButton.addEventListener("click", function () {
+    removePaintedImage();
+    removeCurrentDesignMetadata();
+    redrawCanvas(true);
 
-    ctx.save();
+    showCanvasStatus("Paint reset. Your wall selection is still available.");
+});
 
-    ctx.beginPath();
-
-    ctx.moveTo(
-        selectedPoints[0].x,
-        selectedPoints[0].y
-    );
-
-    for (let i = 1; i < selectedPoints.length; i++) {
-
-        ctx.lineTo(
-            selectedPoints[i].x,
-            selectedPoints[i].y
-        );
-    }
-
-    ctx.closePath();
-
-    ctx.clip();
-
-    ctx.globalAlpha =
-        Number(paintOpacityInput.value) / 100;
-
-    if (selectedDesign === "solid") {
-
-        ctx.fillStyle = color;
-
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-    }
-
-    if (selectedDesign === "vertical-stripes") {
-
-        ctx.fillStyle = color;
-
-        for (let x = 0; x < canvas.width; x += 40) {
-
-            ctx.fillRect(
-                x,
-                0,
-                20,
-                canvas.height
-            );
-        }
-
-    }
-
-    if (selectedDesign === "horizontal-stripes") {
-
-        ctx.fillStyle = color;
-
-        for (let y = 0; y < canvas.height; y += 40) {
-
-            ctx.fillRect(
-                0,
-                y,
-                canvas.width,
-                20
-            );
-        }
-
-    }
-
-    if (selectedDesign === "grid") {
-
-        ctx.fillStyle = color;
-
-        for (let x = 0; x < canvas.width; x += 40) {
-
-            ctx.fillRect(
-                x,
-                0,
-                20,
-                canvas.height
-            );
-        }
-
-        for (let y = 0; y < canvas.height; y += 40) {
-
-            ctx.fillRect(
-                0,
-                y,
-                canvas.width,
-                20
-            );
-        }
-
-    }
-
-    ctx.restore();
-
-    drawSelection(true);
-}
-previewDesignButton.addEventListener("click", function () {
-
-    if (selectedPoints.length < 3) {
-
-        selectionStatus.textContent =
-            "Please select and paint a wall before previewing.";
-
+previewButton.addEventListener("click", function () {
+    if (!getPaintedImage()) {
+        showCanvasStatus("Apply a paint design before opening the preview.", "error");
         return;
     }
-
-    const paintedImage =
-        canvas.toDataURL("image/png");
-
-    savePaintedImage(paintedImage);
 
     window.location.href = "preview.html";
-
 });
+
+roomImage.onload = function () {
+    setCanvasSize();
+    drawOriginalImage();
+    showCanvasStatus("Image loaded. Start selecting the wall.");
+};
+
+roomImage.onerror = function () {
+    showCanvasStatus("The room image could not be loaded.", "error");
+};
+
+const storedRoomImage = getRoomImage();
+
+if (storedRoomImage) {
+    roomImage.src = storedRoomImage;
+} else {
+    showCanvasStatus("No room image found. Please upload a room image first.", "error");
+
+    setTimeout(function () {
+        window.location.href = "upload.html";
+    }, 1200);
+}

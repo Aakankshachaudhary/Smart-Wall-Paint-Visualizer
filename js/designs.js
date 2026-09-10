@@ -1,25 +1,19 @@
-const designOptions =
-    document.querySelectorAll(".design-option");
-
 let selectedDesign = "solid";
 
-designOptions.forEach(function (option) {
+const designButtons = document.querySelectorAll(".design-option");
 
-    option.addEventListener("click", function () {
+designButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+        selectedDesign = button.dataset.design;
 
-        selectedDesign =
-            option.getAttribute("data-design");
-
-        designOptions.forEach(function (item) {
+        designButtons.forEach((item) => {
             item.classList.remove("active");
         });
 
-        option.classList.add("active");
-
-        console.log(
-            "Selected design:",
-            selectedDesign
-        );
+        button.classList.add("active");
     });
-
 });
+
+function getSelectedDesign() {
+    return selectedDesign;
+}
