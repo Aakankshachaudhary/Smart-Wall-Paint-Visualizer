@@ -41,7 +41,7 @@ if (saveDesignButton) {
                 return;
             }
 
-            const design = {
+             const design = {
 
                 image: paintedImage,
 
@@ -107,36 +107,64 @@ if (savedDesignsContainer) {
                     "saved-design-card"
                 );
 
-                designCard.innerHTML = `
-                  <img
-                    src="${design.image}"
-                    alt="Saved wall design"
-                  >
+              designCard.innerHTML = ` <img src="${design.image}"alt="Saved wall design" >
+               <p>Saved: ${design.date}</p>
 
-                 <p>
-                     Saved: ${design.date}
-                 </p>
+               <button type="button" class="download-saved-design">
+                  Download Design
+               </button>
 
-                 <button
-                   type="button"
-                   class="download-saved-design"
-                 >
-                    Download Design
-                  </button>
-                `;
+              <button type="button" class="delete-saved-design">
+                  Delete Design
+              </button>
+             `;
 
-const downloadButton =
-   designCard.querySelector( ".download-saved-design");
+             const downloadButton =
+             designCard.querySelector( ".download-saved-design");
 
-    downloadButton.addEventListener( "click",function () {
-       const downloadLink =document.createElement("a");
+             downloadButton.addEventListener( "click",function () {
+             const downloadLink =document.createElement("a");
 
-       downloadLink.href =design.image;
+             downloadLink.href =design.image;
 
-       downloadLink.download = "smart-wall-design-" +(savedDesigns.indexOf(design) + 1) + ".png";
+            downloadLink.download = "smart-wall-design-" +(savedDesigns.indexOf(design) + 1) + ".png";
 
-       downloadLink.click();
+             downloadLink.click();
  }
+);
+
+const deleteButton =
+    designCard.querySelector(
+        ".delete-saved-design"
+    );
+
+deleteButton.addEventListener(
+    "click",
+    function () {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this design?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        deleteSavedDesign(design.id)
+            .then(function () {
+
+                designCard.remove();
+
+            })
+            .catch(function (error) {
+
+                console.error(
+                    "Unable to delete design:",
+                    error
+                );
+            });
+    }
 );
                 savedDesignsContainer.appendChild(
                     designCard

@@ -123,6 +123,48 @@ function getSavedDesigns() {
     });
 }
 
+function deleteSavedDesign(id) {
+
+    return new Promise(function (resolve, reject) {
+
+        const request =
+            indexedDB.open("SmartWallPaintDB", 1);
+
+        request.onsuccess = function (event) {
+
+            const db = event.target.result;
+
+            const transaction =
+                db.transaction(
+                    ["designs"],
+                    "readwrite"
+                );
+
+            const store =
+                transaction.objectStore("designs");
+
+            store.delete(id);
+
+            transaction.oncomplete = function () {
+
+                db.close();
+                resolve();
+            };
+
+            transaction.onerror = function () {
+
+                db.close();
+                reject(transaction.error);
+            };
+        };
+
+        request.onerror = function () {
+
+            reject(request.error);
+        };
+    });
+}
+
 function removeSavedDesigns() {
 
     return new Promise(function (resolve, reject) {
