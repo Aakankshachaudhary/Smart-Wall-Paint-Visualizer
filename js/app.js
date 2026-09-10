@@ -108,15 +108,36 @@ if (savedDesignsContainer) {
                 );
 
                 designCard.innerHTML = `
-                    <img
-                        src="${design.image}"
-                        alt="Saved wall design"
-                    >
-                    <p>
-                        Saved: ${design.date}
-                    </p>
+                  <img
+                    src="${design.image}"
+                    alt="Saved wall design"
+                  >
+
+                 <p>
+                     Saved: ${design.date}
+                 </p>
+
+                 <button
+                   type="button"
+                   class="download-saved-design"
+                 >
+                    Download Design
+                  </button>
                 `;
 
+const downloadButton =
+   designCard.querySelector( ".download-saved-design");
+
+    downloadButton.addEventListener( "click",function () {
+       const downloadLink =document.createElement("a");
+
+       downloadLink.href =design.image;
+
+       downloadLink.download = "smart-wall-design-" +(savedDesigns.indexOf(design) + 1) + ".png";
+
+       downloadLink.click();
+ }
+);
                 savedDesignsContainer.appendChild(
                     designCard
                 );
@@ -130,6 +151,34 @@ if (savedDesignsContainer) {
             );
         });
 }
-}      
+}   
+const downloadDesignButton =
+    document.getElementById("download-design");
+
+if (downloadDesignButton) {
+
+    downloadDesignButton.addEventListener(
+        "click",
+        function () {
+
+            const paintedImage =
+                getPaintedImage();
+
+            if (!paintedImage) {
+                return;
+            }
+
+            const downloadLink =
+                document.createElement("a");
+
+            downloadLink.href =
+                paintedImage;
+
+            downloadLink.download ="smart-wall-painted-design-" +new Date().getTime() +".png";
+
+            downloadLink.click();
+        }
+    );
+}   
 
         
