@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Room | Smart Paint</title>
+    <title>Upload Room | Smart Wall Paint Visualizer</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/responsive.css">
@@ -11,22 +11,36 @@
 <body>
     <main>
         <section class="upload-section">
-            <h1>
-                Upload Your Room
-            </h1>
-            <p>
-                Upload a clear JPG or PNG image of your room.
-            </p>
-            <form id="upload-form" name="uploadForm">
-                <label for="room-image">Choose Room Image</label>
-                <input type="file" id="room-image" name="roomImage" accept="image/jpeg,image/png">
-                <div id="image-preview" class="image-preview"></div>
-                <p id="upload-error" class="upload-error"></p>
-                <p>Upload only images that your own or have permission to use.</p>
-                <button type="submit">Continue</button>
-            </form>
+            <div class="container">
+                <h1>Upload Your Room</h1>
+                <p>Upload a clear JPG or PNG image of your room.</p>
+
+                <form id="upload-form" name="uploadForm">
+                    <label for="room-image">Choose Room Image</label>
+
+                    <div id="upload-drop-zone" class="upload-drop-zone" tabindex="0">
+                        <p><strong>Drop your room image here</strong></p>
+                        <p>or choose a file from your device</p>
+                        <input
+                            type="file"
+                            id="room-image"
+                            name="roomImage"
+                            accept="image/jpeg,image/png"
+                        >
+                    </div>
+
+                    <div id="image-preview" class="image-preview" hidden></div>
+                    <p id="upload-message" class="upload-message" role="status" aria-live="polite"></p>
+                    <p id="upload-file-info" class="upload-file-info"></p>
+
+                    <p>Upload only images that you own or have permission to use.</p>
+
+                    <button type="submit" id="upload-submit">Continue</button>
+                </form>
+            </div>
         </section>
     </main>
+
     <script src="../js/storage.js"></script>
     <script src="../js/upload.js"></script>
 </body>

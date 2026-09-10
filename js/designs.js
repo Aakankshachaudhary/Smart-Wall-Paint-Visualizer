@@ -1,19 +1,37 @@
-let selectedDesign = "solid";
+const paintColorInput = document.getElementById("paint-color");
+const colorButtons = document.querySelectorAll(".color-option");
 
-const designButtons = document.querySelectorAll(".design-option");
+function setActiveColor(button) {
+    colorButtons.forEach((item) => item.classList.remove("active"));
 
-designButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-        selectedDesign = button.dataset.design;
-
-        designButtons.forEach((item) => {
-            item.classList.remove("active");
-        });
-
+    if (button) {
         button.classList.add("active");
+    }
+}
+
+colorButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+        if (!paintColorInput) return;
+
+        paintColorInput.value = button.dataset.color;
+        setActiveColor(button);
+
+        document.dispatchEvent(
+            new CustomEvent("paintcolorchange", {
+                detail: { color: button.dataset.color }
+            })
+        );
     });
 });
 
-function getSelectedDesign() {
-    return selectedDesign;
+if (paintColorInput) {
+    paintColorInput.addEventListener("input", function () {
+        setActiveColor(null);
+
+        document.dispatchEvent(
+            new CustomEvent("paintcolorchange", {
+                detail: { color: paintColorInput.value }
+            })
+        );
+    });
 }

@@ -1,94 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Preview Design</title>
-
-    <link
-        rel="stylesheet"
-        href="../css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/components.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../css/responsive.css"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Design | Smart Wall Paint Visualizer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
 </head>
-
 <body>
-
     <header class="site-header">
-
-        <h1>Smart Wall Paint Visualizer</h1>
-
+        <div class="container header-container">
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">🎨</span>
+                <span class="logo-text">Smart Paint</span>
+            </a>
+            <nav class="main-navigation" aria-label="Main navigation">
+                <a href="../index.html">Home</a>
+                <a href="upload.html">Visualizer</a>
+                <a href="saved-designs.html">My Designs</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-
         <section class="preview-section">
+            <div class="container">
+                <h1>Before &amp; After Preview</h1>
+                <p class="page-description">
+                    Compare your original room with the painted design before saving it.
+                </p>
 
-            <h2>Before & After Preview</h2>
+                <div id="preview-status" class="preview-status" role="status" aria-live="polite"></div>
 
-            <div class="preview-container">
-
-                <div class="preview-card">
-
-                    <h3>Before</h3>
-
-                    <img
-                        id="before-image"
-                        alt="Original room"
-                    >
-
+                <div class="preview-controls" aria-label="Preview display options">
+                    <button type="button" class="preview-mode active" data-mode="side-by-side">
+                        Side by Side
+                    </button>
+                    <button type="button" class="preview-mode" data-mode="before">
+                        Show Before
+                    </button>
+                    <button type="button" class="preview-mode" data-mode="after">
+                        Show After
+                    </button>
                 </div>
 
-                <div class="preview-card">
+                <div id="preview-container" class="preview-container">
+                    <div class="preview-card" id="before-card">
+                        <h2>Before</h2>
+                        <img id="before-image" alt="Original room">
+                    </div>
 
-                    <h3>After</h3>
-
-                    <img
-                        id="after-image"
-                        alt="Painted room"
-                    >
-
+                    <div class="preview-card" id="after-card">
+                        <h2>After</h2>
+                        <img id="after-image" alt="Room with selected wall paint">
+                    </div>
                 </div>
-                
+
+                <div id="design-summary" class="design-summary"></div>
+
                 <div class="preview-actions">
-
-                       <button type="button" id="save-design">
-                        Save Design
-                       </button>
-
-                     <button type="button" id="download-design">
-                      Download Design
-                     </button>
-
-              </div> 
-
+                    <button type="button" id="save-design">Save Design</button>
+                    <button type="button" id="download-design">Download Design</button>
+                    <a href="wall-selection.html" class="button-link">Edit Design</a>
+                    <a href="saved-designs.html" class="button-link secondary-button-link">My Designs</a>
+                </div>
             </div>
-
         </section>
-
     </main>
 
     <script src="../js/storage.js"></script>
-   <script src="../js/app.js"></script>
-
-
+    <script src="../js/app.js"></script>
 </body>
-
 </html>

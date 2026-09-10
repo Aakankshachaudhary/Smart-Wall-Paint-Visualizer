@@ -11,13 +11,27 @@ function setActiveColor(button) {
 
 colorButtons.forEach((button) => {
     button.addEventListener("click", function () {
+        if (!paintColorInput) return;
+
         paintColorInput.value = button.dataset.color;
         setActiveColor(button);
+
+        document.dispatchEvent(
+            new CustomEvent("paintcolorchange", {
+                detail: { color: button.dataset.color }
+            })
+        );
     });
 });
 
 if (paintColorInput) {
     paintColorInput.addEventListener("input", function () {
         setActiveColor(null);
+
+        document.dispatchEvent(
+            new CustomEvent("paintcolorchange", {
+                detail: { color: paintColorInput.value }
+            })
+        );
     });
 }

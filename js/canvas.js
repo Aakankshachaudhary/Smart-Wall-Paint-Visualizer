@@ -30,7 +30,7 @@ function showCanvasStatus(message, type = "") {
 }
 
 function setCanvasSize() {
-    if (!roomImage.naturalWidth || !roomImage.naturalHeight) return;
+    if (!roomImage.naturalWidth || !roomImage.naturalHeight || !canvas) return;
 
     canvas.width = roomImage.naturalWidth;
     canvas.height = roomImage.naturalHeight;
@@ -169,123 +169,206 @@ function getCurrentMetadata() {
     };
 }
 
-canvas.addEventListener("click", function (event) {
-    if (!isSelecting) return;
+function updateControlStates() {
+    const hasPoints = selectedPoints.length > 0;
+    const hasFinishedSelection = isSelectionFinished;
+    const hasPaintedImage = Boolean(getPaintedImage());
 
-    selectedPoints.push(getCanvasPoint(event));
-    redrawCanvas(true);
-
-    showCanvasStatus(
-        `${selectedPoints.length} point${selectedPoints.length === 1 ? "" : "s"} selected.`
-    );
-});
-
-startSelectionButton.addEventListener("click", function () {
-    selectedPoints = [];
-    isSelecting = true;
-    isSelectionFinished = false;
-
-    removePaintedImage();
-    removeCurrentDesignMetadata();
-    redrawCanvas(true);
-
-    showCanvasStatus("Click around the wall to create your selection.");
-});
-
-undoSelectionButton.addEventListener("click", function () {
-    if (selectedPoints.length === 0) return;
-
-    selectedPoints.pop();
-    isSelectionFinished = false;
-    redrawCanvas(true);
-
-    showCanvasStatus(`${selectedPoints.length} point(s) selected.`);
-});
-
-clearSelectionButton.addEventListener("click", function () {
-    selectedPoints = [];
-    isSelecting = false;
-    isSelectionFinished = false;
-
-    removePaintedImage();
-    removeCurrentDesignMetadata();
-    redrawCanvas(false);
-
-    showCanvasStatus("Wall selection cleared.");
-});
-
-finishSelectionButton.addEventListener("click", function () {
-    if (selectedPoints.length < 3) {
-        showCanvasStatus("Select at least 3 points before finishing.", "error");
-        return;
+    if (undoSelectionButton) {
+        undoSelectionButton.disabled = !hasPoints;
     }
 
-    isSelecting = false;
-    isSelectionFinished = true;
-    redrawCanvas(true);
-
-    showCanvasStatus("Wall selected successfully.", "success");
-});
-
-paintOpacityInput.addEventListener("input", function () {
-    opacityValue.textContent = `${paintOpacityInput.value}%`;
-
-    if (isSelectionFinished) {
-        paintWall(paintColorInput.value, true);
-    } else {
-        redrawCanvas(true);
+    if (clearSelectionButton) {
+        clearSelectionButton.disabled = !hasPoints && !hasPaintedImage;
     }
-});
 
-applyPaintButton.addEventListener("click", function () {
+    if (finishSelectionButton) {
+        finishSelectionButton.disabled = selectedPoints.length < 3;
+    }
+
+    if (applyPaintButton) {
+        applyPaintButton.disabled = !hasFinishedSelection;
+    }
+
+    if (resetPaintButton) {
+        resetPaintButton.disabled = !hasPaintedImage;
+    }
+
+    if (previewButton) {
+        previewButton.disabled = !hasPaintedImage;
+    }
+}
+
+function showLivePaintPreview() {
     if (!isSelectionFinished) {
-        showCanvasStatus("Finish the wall selection before applying paint.", "error");
+        redrawCanvas(true);
         return;
     }
 
-    const paintedImage = paintWall(paintColorInput.value, false);
+    paintWall(paintColorInput.value, true);
+    updateControlStates();
+}
 
-    if (!paintedImage) return;
+if (canvas) {
+    canvas.addEventListener("click", function (event) {
+        if (!isSelecting) return;
 
-    savePaintedImage(paintedImage);
-    saveCurrentDesignMetadata(getCurrentMetadata());
+        selectedPoints.push(getCanvasPoint(event));
+        redrawCanvas(true);
+        updateControlStates();
 
-    redrawCanvas(true);
-    showCanvasStatus("Paint applied successfully.", "success");
+        showCanvasStatus(
+            `${selectedPoints.length} point${selectedPoints.length === 1 ? "" : "s"} selected.`
+        );
+    });
+}
+
+if (startSelectionButton) {
+    startSelectionButton.addEventListener("click", function () {
+        selectedPoints = [];
+        isSelecting = true;
+        isSelectionFinished = false;
+
+        removePaintedImage();
+        removeCurrentDesignMetadata();
+        redrawCanvas(true);
+        updateControlStates();
+
+        showCanvasStatus("Click around the wall to create your selection.");
+    });
+}
+
+if (undoSelectionButton) {
+    undoSelectionButton.addEventListener("click", function () {
+        if (selectedPoints.length === 0) return;
+
+        selectedPoints.pop();
+        isSelectionFinished = false;
+        redrawCanvas(true);
+        updateControlStates();
+
+        showCanvasStatus(`${selectedPoints.length} point(s) selected.`);
+    });
+}
+
+if (clearSelectionButton) {
+    clearSelectionButton.addEventListener("click", function () {
+        selectedPoints = [];
+        isSelecting = false;
+        isSelectionFinished = false;
+
+        removePaintedImage();
+        removeCurrentDesignMetadata();
+        redrawCanvas(false);
+        updateControlStates();
+
+        showCanvasStatus("Wall selection cleared.");
+    });
+}
+
+if (finishSelectionButton) {
+    finishSelectionButton.addEventListener("click", function () {
+        if (selectedPoints.length < 3) {
+            showCanvasStatus("Select at least 3 points before finishing.", "error");
+            return;
+        }
+
+        isSelecting = false;
+        isSelectionFinished = true;
+        redrawCanvas(true);
+        updateControlStates();
+
+        showCanvasStatus("Wall selected successfully. Live preview is ready.", "success");
+    });
+}
+
+if (paintOpacityInput) {
+    paintOpacityInput.addEventListener("input", function () {
+        opacityValue.textContent = `${paintOpacityInput.value}%`;
+        showLivePaintPreview();
+    });
+}
+
+document.addEventListener("paintcolorchange", function () {
+    showLivePaintPreview();
 });
 
-resetPaintButton.addEventListener("click", function () {
-    removePaintedImage();
-    removeCurrentDesignMetadata();
-    redrawCanvas(true);
-
-    showCanvasStatus("Paint reset. Your wall selection is still available.");
+document.addEventListener("designchange", function () {
+    showLivePaintPreview();
 });
 
-previewButton.addEventListener("click", function () {
-    if (!getPaintedImage()) {
-        showCanvasStatus("Apply a paint design before opening the preview.", "error");
-        return;
+if (applyPaintButton) {
+    applyPaintButton.addEventListener("click", function () {
+        if (!isSelectionFinished) {
+            showCanvasStatus("Finish the wall selection before applying paint.", "error");
+            return;
+        }
+
+        const paintedImage = paintWall(paintColorInput.value, false);
+
+        if (!paintedImage) return;
+
+        savePaintedImage(paintedImage);
+        saveCurrentDesignMetadata(getCurrentMetadata());
+
+        redrawCanvas(true);
+        updateControlStates();
+
+        showCanvasStatus("Paint applied successfully.", "success");
+    });
+}
+
+if (resetPaintButton) {
+    resetPaintButton.addEventListener("click", function () {
+        removePaintedImage();
+        removeCurrentDesignMetadata();
+        redrawCanvas(true);
+        updateControlStates();
+
+        showCanvasStatus("Paint reset. Your wall selection is still available.");
+    });
+}
+
+if (previewButton) {
+    previewButton.addEventListener("click", function () {
+        if (!getPaintedImage()) {
+            showCanvasStatus("Apply a paint design before opening the preview.", "error");
+            return;
+        }
+
+        window.location.href = "preview.html";
+    });
+}
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && isSelecting) {
+        isSelecting = false;
+        selectedPoints = [];
+        isSelectionFinished = false;
+
+        redrawCanvas(false);
+        updateControlStates();
+        showCanvasStatus("Selection cancelled.");
     }
-
-    window.location.href = "preview.html";
 });
 
 roomImage.onload = function () {
     setCanvasSize();
     drawOriginalImage();
+    updateControlStates();
     showCanvasStatus("Image loaded. Start selecting the wall.");
 };
 
 roomImage.onerror = function () {
+    updateControlStates();
     showCanvasStatus("The room image could not be loaded.", "error");
 };
 
 const storedRoomImage = getRoomImage();
 
-if (storedRoomImage) {
+if (storedRoomImage && canvas && context) {
     roomImage.src = storedRoomImage;
-} else {
+} else if (canvas && context) {
     showCanvasStatus("No room image found. Please upload a room image first.", "error");
 
     setTimeout(function () {

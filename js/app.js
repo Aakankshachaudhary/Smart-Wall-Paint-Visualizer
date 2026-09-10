@@ -2,6 +2,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const beforeImage = document.getElementById("before-image");
     const afterImage = document.getElementById("after-image");
     const previewStatus = document.getElementById("preview-status");
+    const previewContainer = document.getElementById("preview-container");
+    const beforeCard = document.getElementById("before-card");
+    const afterCard = document.getElementById("after-card");
+    const designSummary = document.getElementById("design-summary");
+    const previewModeButtons = document.querySelectorAll(".preview-mode");
 
     const saveDesignButton = document.getElementById("save-design");
     const savedDesignsContainer = document.getElementById("saved-designs-container");
@@ -70,6 +75,47 @@ document.addEventListener("DOMContentLoaded", function () {
         afterImage.onerror = function () {
             showPreviewStatus("The painted design could not be displayed.", "error");
         };
+    }
+
+    function updatePreviewMode(mode) {
+        if (!previewContainer || !beforeCard || !afterCard) return;
+
+        previewContainer.classList.remove("show-before-only", "show-after-only");
+
+        if (mode === "before") {
+            previewContainer.classList.add("show-before-only");
+        } else if (mode === "after") {
+            previewContainer.classList.add("show-after-only");
+        }
+
+        previewModeButtons.forEach((button) => {
+            button.classList.toggle("active", button.dataset.mode === mode);
+        });
+    }
+
+    previewModeButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            updatePreviewMode(button.dataset.mode);
+        });
+    });
+
+    const currentMetadata = getCurrentDesignMetadata();
+
+    if (designSummary && currentMetadata) {
+        const color = escapeHtml(currentMetadata.color || "Custom");
+        const design = escapeHtml(formatDesignName(currentMetadata.design));
+        const opacity = escapeHtml(currentMetadata.opacity ?? 100);
+        const date = escapeHtml(currentMetadata.date || "Not available");
+
+        designSummary.innerHTML = `
+            <h2>Design Details</h2>
+            <div class="design-summary-grid">
+                <p><strong>Colour</strong><span>${color}</span></p>
+                <p><strong>Pattern</strong><span>${design}</span></p>
+                <p><strong>Opacity</strong><span>${opacity}%</span></p>
+                <p><strong>Created</strong><span>${date}</span></p>
+            </div>
+        `;
     }
 
     if (saveDesignButton) {
@@ -141,7 +187,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     >
                     <div class="saved-design-info">
                         <h3>${escapeHtml(formatDesignName(design.design))}</h3>
-                        <p><strong>Colour:</strong> ${escapeHtml(design.color || "Custom")}</p>
+                        <p class="saved-design-colour">
+                            <strong>Colour:</strong>
+                            <span class="colour-value">
+                                <span
+                                    class="colour-swatch"
+                                    style="background-color: ${escapeHtml(design.color || "#ffffff")};"
+                                    aria-hidden="true"
+                                ></span>
+                                ${escapeHtml(design.color || "Custom")}
+                            </span>
+                        </p>
                         <p><strong>Opacity:</strong> ${escapeHtml(design.opacity ?? 100)}%</p>
                         <p><strong>Saved:</strong> ${escapeHtml(design.date || "Unknown")}</p>
                     </div>
@@ -218,6 +274,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showPreviewStatus("Design download started.", "success");
         });
     }
-});  
+}); 
 
         

@@ -40,3 +40,20 @@ A frontend-only wall paint visualization project built with HTML, CSS, and JavaS
 ## Scope
 
 This version intentionally remains frontend-only. It does not use a backend, MongoDB, JWT authentication, or paid APIs.
+
+
+## Phase 2 – Professional UX Upgrade
+
+Phase 2 improves the existing frontend workflow without changing the project to a backend application.
+
+### Added in Phase 2
+- Live wall preview when changing colour, pattern, or opacity after wall selection.
+- Safer control states for Undo, Clear, Finish, Apply, Reset, and Preview.
+- Escape-key support to cancel an active wall selection.
+- Improved before/after preview with Side by Side, Before-only, and After-only modes.
+- Design details summary showing colour, pattern, opacity, and creation date.
+- Edit Design and My Designs navigation from the preview screen.
+- Improved saved-design cards with a visual colour swatch.
+- Drag-and-drop room image upload.
+- File name and file-size feedback during upload.
+- Upload processing state and improved validation/error feedback.
