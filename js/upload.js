@@ -7,6 +7,8 @@ const uploadFileInfo = document.getElementById("upload-file-info");
 const uploadSubmit = document.getElementById("upload-submit");
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 1800;
+const IMAGE_QUALITY = 0.88;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 
 function showUploadMessage(message, type = "") {
@@ -15,50 +17,35 @@ function showUploadMessage(message, type = "") {
     uploadMessage.textContent = message;
     uploadMessage.className = "upload-message";
 
-    if (type) {
-        uploadMessage.classList.add(type);
-    }
+    if (type) uploadMessage.classList.add(type);
 }
 
 function formatFileSize(bytes) {
-    if (bytes < 1024 * 1024) {
-        return `${Math.round(bytes / 1024)} KB`;
-    }
-
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function validateImage(file) {
-    if (!file) {
-        return "Please select an image.";
-    }
-
+    if (!file) return "Please select an image.";
     if (!ALLOWED_TYPES.includes(file.type)) {
         return "Only JPG and PNG images are allowed.";
     }
-
     if (file.size > MAX_FILE_SIZE) {
         return "Image size must be 5 MB or less.";
     }
-
     return "";
 }
 
 function updateFileInfo(file) {
     if (!uploadFileInfo) return;
 
-    if (!file) {
-        uploadFileInfo.textContent = "";
-        return;
-    }
-
-    uploadFileInfo.textContent =
-        `${file.name} • ${formatFileSize(file.size)}`;
+    uploadFileInfo.textContent = file
+        ? `${file.name} • ${formatFileSize(file.size)}`
+        : "";
 }
 
 function previewSelectedFile(file) {
     const error = validateImage(file);
-
     updateFileInfo(file);
 
     if (error) {
@@ -85,18 +72,75 @@ function previewSelectedFile(file) {
     imagePreview.hidden = false;
 
     showUploadMessage("Image is ready to use.", "success");
-
     if (uploadSubmit) uploadSubmit.disabled = false;
 }
 
 function handleFile(file) {
-    if (!file) return;
+    if (!file || !imageInput) return;
 
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    imageInput.files = dataTransfer.files;
+    try {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        imageInput.files = dataTransfer.files;
+    } catch (error) {
+        console.warn("Could not mirror dropped file into the input:", error);
+    }
 
     previewSelectedFile(file);
+}
+
+function readAndOptimizeImage(file) {
+    return new Promise(function (resolve, reject) {
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            const image = new Image();
+
+            image.onload = function () {
+                const scale = Math.min(
+                    1,
+                    MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight)
+                );
+
+                const width = Math.max(1, Math.round(image.naturalWidth * scale));
+                const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+                const processingCanvas = document.createElement("canvas");
+                processingCanvas.width = width;
+                processingCanvas.height = height;
+
+                const processingContext = processingCanvas.getContext("2d");
+
+                if (!processingContext) {
+                    reject(new Error("Canvas processing is not supported."));
+                    return;
+                }
+
+                processingContext.drawImage(image, 0, 0, width, height);
+
+                // JPEG keeps the working image small enough for browser storage
+                // while retaining enough quality for a room visualization.
+                resolve(
+                    processingCanvas.toDataURL(
+                        "image/jpeg",
+                        IMAGE_QUALITY
+                    )
+                );
+            };
+
+            image.onerror = function () {
+                reject(new Error("The selected image could not be decoded."));
+            };
+
+            image.src = reader.result;
+        };
+
+        reader.onerror = function () {
+            reject(new Error("The selected image could not be read."));
+        };
+
+        reader.readAsDataURL(file);
+    });
 }
 
 if (imageInput) {
@@ -127,16 +171,16 @@ if (uploadDropZone) {
     uploadDropZone.addEventListener("keydown", function (event) {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
-            imageInput.click();
+            imageInput?.click();
         }
     });
 }
 
 if (uploadForm) {
-    uploadForm.addEventListener("submit", function (event) {
+    uploadForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        const file = imageInput.files[0];
+        const file = imageInput?.files[0];
         const error = validateImage(file);
 
         if (error) {
@@ -146,35 +190,32 @@ if (uploadForm) {
 
         if (uploadSubmit) {
             uploadSubmit.disabled = true;
-            uploadSubmit.textContent = "Processing...";
+            uploadSubmit.textContent = "Preparing image...";
         }
 
-        const reader = new FileReader();
+        try {
+            const optimizedImage = await readAndOptimizeImage(file);
 
-        reader.onload = function () {
-            saveRoomImage(reader.result);
+            saveRoomImage(optimizedImage);
             removePaintedImage();
             removeCurrentDesignMetadata();
+            removeCurrentSelection();
 
             window.location.href = "wall-selection.html";
-        };
+        } catch (processingError) {
+            console.error("Could not process image:", processingError);
 
-        reader.onerror = function () {
             if (uploadSubmit) {
                 uploadSubmit.disabled = false;
                 uploadSubmit.textContent = "Continue";
             }
 
             showUploadMessage(
-                "The image could not be processed. Please try again.",
+                "The image could not be processed. Please try another JPG or PNG.",
                 "error"
             );
-        };
-
-        reader.readAsDataURL(file);
+        }
     });
 }
 
-if (uploadSubmit) {
-    uploadSubmit.disabled = true;
-}
+if (uploadSubmit) uploadSubmit.disabled = true;

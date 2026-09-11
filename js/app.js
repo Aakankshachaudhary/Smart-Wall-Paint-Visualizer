@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const afterCard = document.getElementById("after-card");
     const designSummary = document.getElementById("design-summary");
     const previewModeButtons = document.querySelectorAll(".preview-mode");
+    const comparisonBeforeImage = document.getElementById("comparison-before-image");
+    const comparisonAfterImage = document.getElementById("comparison-after-image");
+    const comparisonAfterLayer = document.getElementById("comparison-after-layer");
+    const comparisonDivider = document.getElementById("comparison-divider");
+    const comparisonSlider = document.getElementById("comparison-slider");
+    const comparisonValue = document.getElementById("comparison-value");
 
     const saveDesignButton = document.getElementById("save-design");
     const savedDesignsContainer = document.getElementById("saved-designs-container");
@@ -72,6 +78,11 @@ document.addEventListener("DOMContentLoaded", function () {
         beforeImage.src = roomImage;
         afterImage.src = paintedImage;
 
+        if (comparisonBeforeImage && comparisonAfterImage) {
+            comparisonBeforeImage.src = roomImage;
+            comparisonAfterImage.src = paintedImage;
+        }
+
         beforeImage.onerror = function () {
             showPreviewStatus("The original room image could not be displayed.", "error");
         };
@@ -79,6 +90,26 @@ document.addEventListener("DOMContentLoaded", function () {
         afterImage.onerror = function () {
             showPreviewStatus("The painted design could not be displayed.", "error");
         };
+    }
+
+    function updateComparison(value) {
+        const amount = Number(value);
+        if (!comparisonAfterLayer || !comparisonDivider) return;
+
+        comparisonAfterLayer.style.clipPath = `inset(0 ${100 - amount}% 0 0)`;
+        comparisonDivider.style.left = `${amount}%`;
+
+        if (comparisonValue) {
+            comparisonValue.textContent = `${amount}% After`;
+        }
+    }
+
+    if (comparisonSlider) {
+        comparisonSlider.addEventListener("input", function () {
+            updateComparison(comparisonSlider.value);
+        });
+
+        updateComparison(comparisonSlider.value);
     }
 
     function updatePreviewMode(mode) {
@@ -141,7 +172,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     color: metadata?.color || "#ffffff",
                     design: metadata?.design || "solid",
                     opacity: metadata?.opacity ?? 100,
-                    date: metadata?.date || new Date().toLocaleString()
+                    date: metadata?.date || new Date().toLocaleString(),
+                    createdAt: metadata?.createdAt || new Date().toISOString()
                 });
 
                 saveDesignButton.querySelector(".action-text").textContent = "Design Saved";
@@ -180,6 +212,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function getDesignTime(design) {
+        const time = Date.parse(design.createdAt || "");
+        return Number.isFinite(time) ? time : Number(design.id || 0);
+    }
+
     function renderSavedDesigns() {
         if (!savedDesignsContainer) return;
 
@@ -199,11 +236,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         filteredDesigns.sort(function (a, b) {
-            if (sortType === "oldest") return (a.id || 0) - (b.id || 0);
+            if (sortType === "oldest") {
+                return getDesignTime(a) - getDesignTime(b);
+            }
             if (sortType === "pattern") {
                 return formatDesignName(a.design).localeCompare(formatDesignName(b.design));
             }
-            return (b.id || 0) - (a.id || 0);
+            return getDesignTime(b) - getDesignTime(a);
         });
 
         if (savedDesignCount) {
@@ -308,5 +347,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
 
         

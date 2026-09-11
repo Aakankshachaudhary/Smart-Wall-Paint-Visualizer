@@ -57,6 +57,25 @@
                     </div>
                 </div>
 
+                <section class="comparison-tool" aria-label="Interactive before and after comparison">
+                    <div class="comparison-header">
+                        <div>
+                            <span class="eyebrow">COMPARE</span>
+                            <h2>Slide to compare</h2>
+                        </div>
+                        <span id="comparison-value">50% After</span>
+                    </div>
+                    <div class="comparison-frame" id="comparison-frame">
+                        <img id="comparison-before-image" alt="Original room comparison">
+                        <div class="comparison-after-layer" id="comparison-after-layer">
+                            <img id="comparison-after-image" alt="Painted room comparison">
+                        </div>
+                        <span class="comparison-divider" id="comparison-divider" aria-hidden="true"></span>
+                    </div>
+                    <label class="comparison-slider-label" for="comparison-slider">After image amount</label>
+                    <input type="range" id="comparison-slider" min="0" max="100" value="50">
+                </section>
+
                 <div id="design-summary" class="design-summary"></div>
 
                 <div class="preview-actions" aria-label="Design actions">

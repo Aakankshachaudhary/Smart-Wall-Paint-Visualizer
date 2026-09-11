@@ -48,6 +48,29 @@ function removeCurrentDesignMetadata() {
     sessionStorage.removeItem("currentDesignMetadata");
 }
 
+
+// Current wall selection
+function saveCurrentSelection(selection) {
+    sessionStorage.setItem("currentWallSelection", JSON.stringify(selection));
+}
+
+function getCurrentSelection() {
+    const data = sessionStorage.getItem("currentWallSelection");
+
+    if (!data) return null;
+
+    try {
+        return JSON.parse(data);
+    } catch (error) {
+        console.error("Could not read wall selection:", error);
+        return null;
+    }
+}
+
+function removeCurrentSelection() {
+    sessionStorage.removeItem("currentWallSelection");
+}
+
 // IndexedDB for saved designs.
 // Images are too large for localStorage, so saved designs use IndexedDB.
 function openDesignDatabase() {

@@ -61,3 +61,21 @@ Phase 2 improves the existing frontend workflow without changing the project to 
 ## Phase 3 Improvements
 
 Phase 3 focuses on a more professional editing workflow and better saved-design productivity. The wall selector now shows visible selection points and a live point count, supports keyboard shortcuts for undo, finish, and cancel, and gives clearer selection guidance. Saved Designs now includes search and sorting controls so users can quickly find saved colour or pattern combinations.
+
+
+## Phase 4 – Final Product Polish
+
+Phase 4 is the final frontend-focused product upgrade. It keeps the existing workflow intact and adds the finishing touches needed for a realistic room-painting experience.
+
+### Added in Phase 4
+- Natural wall-colour rendering using the canvas colour blend mode so existing room brightness, shadows, and texture remain visible.
+- Persistent wall-selection points while editing, so accidental navigation back to the editor does not immediately lose the current selection.
+- Optimized uploaded room images (maximum working dimension 1800px) to reduce browser-storage pressure while retaining good visual quality.
+- Interactive before/after comparison slider on the preview page.
+- Improved editor hierarchy, guidance, live-preview messaging, canvas framing, focus states, and responsive layouts.
+- More reliable saved-design sorting using creation timestamps when available.
+- Improved small-screen controls and touch-friendly canvas behavior.
+- Preserves all Phase 1–3 functionality without creating a second implementation of the same feature.
+
+### Product Scope
+This is a frontend-only implementation. It is suitable as a polished portfolio/project demonstration and as a strong UI prototype. A commercial production deployment would additionally need a secure backend, user accounts, cloud image storage, server-side validation, database persistence, authentication, monitoring, and deployment infrastructure.

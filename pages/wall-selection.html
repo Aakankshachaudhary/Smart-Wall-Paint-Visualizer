@@ -28,11 +28,16 @@
                 Select Your Wall
             </h1>
 
-            <p>
-                Select the wall area you want to paint.
+            <p class="page-description">
+                Mark the corners of one wall, then experiment with colour, pattern, and opacity.
             </p>
 
             <div class="canvas-container">
+
+                <div class="editor-navigation">
+                    <a href="upload.html" class="button-link secondary-button-link">← Change Room Photo</a>
+                    <a href="saved-designs.html" class="button-link secondary-button-link">My Designs</a>
+                </div>
 
                 <!-- Wall Selection Tools -->
 
@@ -78,7 +83,16 @@
 
                 <!-- Paint Controls -->
 
-                <div class="paint-controls">
+                <div class="editor-panel">
+                    <div class="editor-section-title">
+                        <div>
+                            <span class="eyebrow">WALL EDITOR</span>
+                            <h2>Customize your wall</h2>
+                        </div>
+                        <span class="editor-tip">Live preview</span>
+                    </div>
+
+                    <div class="paint-controls">
 
                     <!-- Paint Colour -->
 
@@ -281,7 +295,7 @@
                 <div class="selection-guide" aria-live="polite">
                     <div>
                         <strong>How to select:</strong>
-                        <span>Click around the wall corners, then finish the selection.</span>
+                        <span id="selection-hint">Click Start Selection, then mark the wall corners.</span>
                     </div>
                     <span id="selection-point-count" class="selection-point-count">0 points</span>
                 </div>
@@ -297,9 +311,14 @@
                 </div>
 
 
+                <p class="editor-help">
+                    Tip: keep your points just inside the wall edges for a cleaner preview.
+                    The visualization preserves the room's natural brightness and shadows.
+                </p>
+
                 <!-- Wall Canvas -->
 
-                <div>
+                <div class="canvas-stage">
 
                     <canvas
                         id="wallCanvas"
