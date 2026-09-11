@@ -44,6 +44,19 @@
 
             <h2>Saved Designs</h2>
 
+            <div class="saved-design-toolbar" aria-label="Saved design filters">
+                <label for="saved-design-search">Search designs</label>
+                <input type="search" id="saved-design-search" placeholder="Search by pattern or colour...">
+                <label for="saved-design-sort">Sort</label>
+                <select id="saved-design-sort">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="pattern">Pattern A-Z</option>
+                </select>
+            </div>
+
+            <p id="saved-design-count" class="saved-design-count" aria-live="polite"></p>
+
             <div
                 id="saved-designs-container"
                 class="saved-designs-container"

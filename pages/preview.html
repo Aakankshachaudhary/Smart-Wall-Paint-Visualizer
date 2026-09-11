@@ -59,11 +59,21 @@
 
                 <div id="design-summary" class="design-summary"></div>
 
-                <div class="preview-actions">
-                    <button type="button" id="save-design">Save Design</button>
-                    <button type="button" id="download-design">Download Design</button>
-                    <a href="wall-selection.html" class="button-link">Edit Design</a>
-                    <a href="saved-designs.html" class="button-link secondary-button-link">My Designs</a>
+                <div class="preview-actions" aria-label="Design actions">
+                    <div class="primary-actions">
+                        <button type="button" id="save-design" class="action-button primary-action">
+                            <span class="action-icon" aria-hidden="true">💾</span>
+                            <span class="action-text">Save Design</span>
+                        </button>
+                        <button type="button" id="download-design" class="action-button secondary-action">
+                            <span class="action-icon" aria-hidden="true">↓</span>
+                            <span class="action-text">Download Design</span>
+                        </button>
+                    </div>
+                    <div class="secondary-actions">
+                        <a href="wall-selection.html" class="button-link">Edit Design</a>
+                        <a href="saved-designs.html" class="button-link secondary-button-link">My Designs</a>
+                    </div>
                 </div>
             </div>
         </section>

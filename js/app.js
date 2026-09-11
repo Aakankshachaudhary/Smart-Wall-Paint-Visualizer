@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const saveDesignButton = document.getElementById("save-design");
     const savedDesignsContainer = document.getElementById("saved-designs-container");
+    const savedDesignSearch = document.getElementById("saved-design-search");
+    const savedDesignSort = document.getElementById("saved-design-sort");
+    const savedDesignCount = document.getElementById("saved-design-count");
+    let savedDesigns = [];
 
     function showPreviewStatus(message, type = "") {
         if (!previewStatus) return;
@@ -129,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             saveDesignButton.disabled = true;
-            saveDesignButton.textContent = "Saving...";
+            saveDesignButton.querySelector(".action-text").textContent = "Saving...";
 
             try {
                 await saveDesign({
@@ -140,12 +144,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     date: metadata?.date || new Date().toLocaleString()
                 });
 
-                saveDesignButton.textContent = "Design Saved";
+                saveDesignButton.querySelector(".action-text").textContent = "Design Saved";
                 showPreviewStatus("Design saved successfully.", "success");
             } catch (error) {
                 console.error("Could not save design:", error);
                 saveDesignButton.disabled = false;
-                saveDesignButton.textContent = "Save Design";
+                saveDesignButton.querySelector(".action-text").textContent = "Save Design";
                 showPreviewStatus(
                     "The design could not be saved. Please try again.",
                     "error"
@@ -156,6 +160,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (savedDesignsContainer) {
         loadSavedDesigns();
+
+        savedDesignSearch?.addEventListener("input", renderSavedDesigns);
+        savedDesignSort?.addEventListener("change", renderSavedDesigns);
     }
 
     async function loadSavedDesigns() {
@@ -163,19 +170,55 @@ document.addEventListener("DOMContentLoaded", function () {
             '<p class="loading-state">Loading saved designs...</p>';
 
         try {
-            const designs = await getSavedDesigns();
+            savedDesigns = await getSavedDesigns();
+            renderSavedDesigns();
+        } catch (error) {
+            console.error("Could not load saved designs:", error);
 
-            if (!designs.length) {
-                savedDesignsContainer.innerHTML =
-                    '<p class="empty-state">No saved designs yet. Create and save a wall design to see it here.</p>';
-                return;
+            savedDesignsContainer.innerHTML =
+                '<p class="error-state">Saved designs could not be loaded. Please refresh the page.</p>';
+        }
+    }
+
+    function renderSavedDesigns() {
+        if (!savedDesignsContainer) return;
+
+        if (!savedDesigns.length) {
+            savedDesignsContainer.innerHTML =
+                '<p class="empty-state">No saved designs yet. Create and save a wall design to see it here.</p>';
+            if (savedDesignCount) savedDesignCount.textContent = "";
+            return;
+        }
+
+        const searchTerm = (savedDesignSearch?.value || "").trim().toLowerCase();
+        const sortType = savedDesignSort?.value || "newest";
+        const filteredDesigns = savedDesigns.filter(function (design) {
+            const pattern = formatDesignName(design.design).toLowerCase();
+            const colour = String(design.color || "").toLowerCase();
+            return !searchTerm || pattern.includes(searchTerm) || colour.includes(searchTerm);
+        });
+
+        filteredDesigns.sort(function (a, b) {
+            if (sortType === "oldest") return (a.id || 0) - (b.id || 0);
+            if (sortType === "pattern") {
+                return formatDesignName(a.design).localeCompare(formatDesignName(b.design));
             }
+            return (b.id || 0) - (a.id || 0);
+        });
 
-            savedDesignsContainer.innerHTML = "";
+        if (savedDesignCount) {
+            savedDesignCount.textContent = `${filteredDesigns.length} of ${savedDesigns.length} design${savedDesigns.length === 1 ? "" : "s"}`;
+        }
 
-            designs.sort((a, b) => (b.id || 0) - (a.id || 0));
+        if (!filteredDesigns.length) {
+            savedDesignsContainer.innerHTML =
+                '<p class="empty-state">No designs match your search.</p>';
+            return;
+        }
 
-            designs.forEach(function (design) {
+        savedDesignsContainer.innerHTML = "";
+
+        filteredDesigns.forEach(function (design) {
                 const card = document.createElement("article");
                 card.className = "saved-design-card";
 
@@ -228,12 +271,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     try {
                         await deleteSavedDesign(design.id);
-                        card.remove();
-
-                        if (!savedDesignsContainer.children.length) {
-                            savedDesignsContainer.innerHTML =
-                                '<p class="empty-state">No saved designs yet. Create and save a wall design to see it here.</p>';
-                        }
+                        savedDesigns = savedDesigns.filter(item => item.id !== design.id);
+                        renderSavedDesigns();
                     } catch (error) {
                         console.error("Could not delete design:", error);
                         deleteButton.disabled = false;
@@ -243,12 +282,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 savedDesignsContainer.appendChild(card);
             });
-        } catch (error) {
-            console.error("Could not load saved designs:", error);
-
-            savedDesignsContainer.innerHTML =
-                '<p class="error-state">Saved designs could not be loaded. Please refresh the page.</p>';
-        }
     }
 
     const downloadCurrentButton = document.getElementById("download-design");
@@ -274,6 +307,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showPreviewStatus("Design download started.", "success");
         });
     }
-}); 
+});
 
         

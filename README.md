@@ -57,3 +57,7 @@ Phase 2 improves the existing frontend workflow without changing the project to 
 - Drag-and-drop room image upload.
 - File name and file-size feedback during upload.
 - Upload processing state and improved validation/error feedback.
+
+## Phase 3 Improvements
+
+Phase 3 focuses on a more professional editing workflow and better saved-design productivity. The wall selector now shows visible selection points and a live point count, supports keyboard shortcuts for undo, finish, and cancel, and gives clearer selection guidance. Saved Designs now includes search and sorting controls so users can quickly find saved colour or pattern combinations.

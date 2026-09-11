@@ -13,10 +13,18 @@ const previewButton = document.getElementById("preview-design");
 const paintOpacityInput = document.getElementById("paint-opacity");
 const opacityValue = document.getElementById("opacity-value");
 const selectionStatus = document.getElementById("selection-status");
+const selectionPointCount = document.getElementById("selection-point-count");
 
 let selectedPoints = [];
 let isSelecting = false;
 let isSelectionFinished = false;
+
+function updateSelectionPointCount() {
+    if (!selectionPointCount) return;
+
+    const count = selectedPoints.length;
+    selectionPointCount.textContent = `${count} point${count === 1 ? "" : "s"}`;
+}
 
 function showCanvasStatus(message, type = "") {
     if (!selectionStatus) return;
@@ -28,6 +36,7 @@ function showCanvasStatus(message, type = "") {
         selectionStatus.classList.add(type);
     }
 }
+
 
 function setCanvasSize() {
     if (!roomImage.naturalWidth || !roomImage.naturalHeight || !canvas) return;
@@ -80,6 +89,25 @@ function drawSelectionOutline() {
     context.lineWidth = Math.max(2, canvas.width / 500);
     context.setLineDash([8, 6]);
     context.stroke();
+    context.setLineDash([]);
+
+    selectedPoints.forEach((point, index) => {
+        context.beginPath();
+        context.arc(point.x, point.y, Math.max(5, canvas.width / 150), 0, Math.PI * 2);
+        context.fillStyle = "#ffffff";
+        context.fill();
+        context.strokeStyle = "#2563eb";
+        context.lineWidth = 2;
+        context.stroke();
+
+        if (index === 0) {
+            context.beginPath();
+            context.arc(point.x, point.y, Math.max(2, canvas.width / 300), 0, Math.PI * 2);
+            context.fillStyle = "#2563eb";
+            context.fill();
+        }
+    });
+
     context.restore();
 }
 
@@ -173,6 +201,8 @@ function updateControlStates() {
     const hasPoints = selectedPoints.length > 0;
     const hasFinishedSelection = isSelectionFinished;
     const hasPaintedImage = Boolean(getPaintedImage());
+
+    updateSelectionPointCount();
 
     if (undoSelectionButton) {
         undoSelectionButton.disabled = !hasPoints;
@@ -349,6 +379,22 @@ document.addEventListener("keydown", function (event) {
         redrawCanvas(false);
         updateControlStates();
         showCanvasStatus("Selection cancelled.");
+        return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z" && isSelecting) {
+        event.preventDefault();
+        if (selectedPoints.length > 0) {
+            selectedPoints.pop();
+            redrawCanvas(true);
+            updateControlStates();
+            showCanvasStatus("Last point removed.");
+        }
+        return;
+    }
+
+    if (event.key === "Enter" && isSelecting && selectedPoints.length >= 3) {
+        finishSelectionButton?.click();
     }
 });
 
