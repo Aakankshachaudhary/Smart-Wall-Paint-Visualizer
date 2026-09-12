@@ -1,173 +1,170 @@
-@media (max-width: 768px) {
+/* Responsive rules are intentionally limited to layout adaptations. */
+@media (hover:hover) {
+    .feature-card,.color-card,.saved-card {
+        transition:transform .18s ease,box-shadow .18s ease
+    }
+    .feature-card:hover,.color-card:hover,.saved-card:hover {
+        transform:translateY(-2px);
+        box-shadow:0 14px 34px rgba(16,24,40,.09)
+    }
+}
+@media (pointer:coarse) {
+    .button,.button-link,.design-option,.color-option,.preview-mode,.wall-item {
+        min-height:44px
+    }
+    .color-option {
+        min-height:38px
+    }
+}
+
+@media(max-width:980px) {
+
+    .hero-container,
+    .editor-layout {
+        grid-template-columns: 1fr
+    }
+
+    .editor-sidebar {
+        position: static
+    }
+
+    .features-grid,
+    .steps-container {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .saved-designs-container {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr 1fr
+    }
+}
+
+@media(max-width:700px) {
+    .container {
+        width: min(calc(100% - 24px), var(--container))
+    }
 
     .header-container {
         flex-wrap: wrap;
-        padding: 14px 0;
+        padding: 10px 0
     }
 
     .main-navigation {
         order: 3;
         width: 100%;
         justify-content: center;
-        flex-wrap: wrap;
+        gap: 15px;
+        overflow: auto
+    }
+
+    .header-actions {
+        margin-left: auto
     }
 
     .hero-section {
-        padding: 60px 0;
+        padding: 55px 0
     }
 
-    .hero-content h1 {
-        font-size: 2.4rem;
+    .hero-visual {
+        min-height: 280px
     }
 
-    .hero-actions {
-        flex-wrap: wrap;
-    }
-    .color-grid {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-    #wallCanvas {
-        max-height: 55vh;
+    .features-grid,
+    .steps-container,
+    .saved-designs-container,
+    .admin-grid {
+        grid-template-columns: 1fr
     }
 
-    .selection-controls {
-        gap: 8px;
+    .benefits-list {
+        grid-template-columns: 1fr
     }
+
     .preview-container {
-    grid-template-columns: 1fr;
-}
-.saved-designs-container {
-    grid-template-columns: 1fr;
-}
-}
-
-@media (max-width: 600px) {
-    .saved-design-actions {
-        flex-direction: column;
+        grid-template-columns: 1fr
     }
 
-    .saved-design-preview {
-        height: 180px;
-    }
-}
-
-
-@media (max-width: 768px) {
     .design-summary-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr
     }
 
-    .preview-controls {
-        justify-content: stretch;
-    }
-
-    .preview-mode {
-        flex: 1;
-    }
-
-    .preview-actions {
-        flex-wrap: wrap;
-    }
-
-    .button-link,
-    .preview-actions button {
-        flex: 1;
-        min-width: 140px;
-    }
-}
-
-@media (max-width: 480px) {
-    .design-summary-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .preview-mode {
-        flex-basis: 100%;
-    }
-}
-
-
-@media (max-width: 600px) {
-    .preview-actions {
-        padding: 16px;
-    }
-
+    .preview-actions,
     .primary-actions,
     .secondary-actions {
         flex-direction: column;
+        align-items: stretch
     }
 
-    .primary-actions .action-button,
-    .secondary-actions .button-link {
-        width: 100%;
-        max-width: none;
-        min-width: 0;
+    .saved-toolbar {
+        grid-template-columns: 1fr
     }
-}
 
-@media (max-width: 700px) {
+    .editor-sidebar {
+        padding: 15px
+    }
+
+    .canvas-stage {
+        padding: 5px
+    }
+
     .selection-guide {
         align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .saved-design-toolbar {
-        grid-template-columns: 1fr;
+        flex-direction: column
     }
 }
 
-
-@media (max-width: 700px) {
-    .editor-panel,
-    .comparison-tool {
-        padding: 16px;
-        border-radius: 10px;
+@media(max-width:460px) {
+    .logo-text {
+        display: none
     }
 
-    .editor-section-title,
-    .comparison-header {
-        align-items: flex-start;
-        flex-direction: column;
+    .header-actions .secondary-button {
+        display: none
     }
 
-    .canvas-stage #wallCanvas {
-        max-height: 60vh;
+    .page-shell {
+        padding-top: 30px
     }
 
-    .comparison-frame {
-        aspect-ratio: 4 / 3;
-    }
-}
-
-@media (max-width: 480px) {
-    .editor-panel {
-        padding: 12px;
+    .auth-card,
+    .upload-card {
+        padding: 22px
     }
 
-    .paint-controls {
-        align-items: stretch;
+    .design-summary-grid {
+        grid-template-columns: 1fr
     }
 
-    .paint-controls input[type="color"] {
-        width: 46px;
-        align-self: center;
+    .primary-button,
+    .secondary-button,
+    .button {
+        width: 100%
     }
 
-    .comparison-tool {
-        padding: 12px;
+    .hero-actions {
+        flex-direction: column
+    }
+
+    .hero-actions>* {
+        width: 100%
     }
 }
-
-
-@media (max-width: 480px) {
+@media(max-width:700px) {
+    .upload-tips {
+        grid-template-columns:1fr
+    }
+    .editor-topbar {
+        align-items:flex-start;
+        flex-direction:column
+    }
     .editor-navigation {
-        flex-direction: column;
+        width:100%
     }
-
-    .editor-navigation .button-link {
-        width: 100%;
+    .editor-navigation>* {
+        flex:1
     }
 }
-
 

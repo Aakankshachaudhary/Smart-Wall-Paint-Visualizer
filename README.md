@@ -79,3 +79,4 @@ Phase 4 is the final frontend-focused product upgrade. It keeps the existing wor
 
 ### Product Scope
 This is a frontend-only implementation. It is suitable as a polished portfolio/project demonstration and as a strong UI prototype. A commercial production deployment would additionally need a secure backend, user accounts, cloud image storage, server-side validation, database persistence, authentication, monitoring, and deployment infrastructure.
+

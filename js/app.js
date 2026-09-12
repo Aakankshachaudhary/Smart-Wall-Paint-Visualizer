@@ -1,352 +1,233 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const beforeImage = document.getElementById("before-image");
-    const afterImage = document.getElementById("after-image");
-    const previewStatus = document.getElementById("preview-status");
-    const previewContainer = document.getElementById("preview-container");
-    const beforeCard = document.getElementById("before-card");
-    const afterCard = document.getElementById("after-card");
-    const designSummary = document.getElementById("design-summary");
-    const previewModeButtons = document.querySelectorAll(".preview-mode");
-    const comparisonBeforeImage = document.getElementById("comparison-before-image");
-    const comparisonAfterImage = document.getElementById("comparison-after-image");
-    const comparisonAfterLayer = document.getElementById("comparison-after-layer");
-    const comparisonDivider = document.getElementById("comparison-divider");
-    const comparisonSlider = document.getElementById("comparison-slider");
-    const comparisonValue = document.getElementById("comparison-value");
+document.addEventListener("DOMContentLoaded", async () => {
+  const toast = document.getElementById("toast");
+  const page = document.body.dataset.page;
 
-    const saveDesignButton = document.getElementById("save-design");
-    const savedDesignsContainer = document.getElementById("saved-designs-container");
-    const savedDesignSearch = document.getElementById("saved-design-search");
-    const savedDesignSort = document.getElementById("saved-design-sort");
-    const savedDesignCount = document.getElementById("saved-design-count");
-    let savedDesigns = [];
+  const notify = (message) => {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(
+      () => toast.classList.remove("show"),
+      2600,
+    );
+  };
+  const escapeHtml = (value) =>
+    String(value ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[c],
+    );
+  const label = (d) =>
+    ({
+      solid: "Solid",
+      "vertical-stripes": "Vertical Stripes",
+      "horizontal-stripes": "Horizontal Stripes",
+      grid: "Grid",
+    })[d] || "Solid";
+  const download = (data, name) => {
+    if (!data) return;
+    const a = document.createElement("a");
+    a.href = data;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
 
-    function showPreviewStatus(message, type = "") {
-        if (!previewStatus) return;
-
-        previewStatus.textContent = message;
-        previewStatus.className = "preview-status";
-
-        if (type) {
-            previewStatus.classList.add(type);
-        }
+  if (page === "preview") {
+    const after = getPaintedImage(),
+      meta = getCurrentDesignMetadata() || {};
+    const beforeImg = document.getElementById("before-image"),
+      afterImg = document.getElementById("after-image");
+    const cb = document.getElementById("comparison-before-image"),
+      ca = document.getElementById("comparison-after-image");
+    const before =
+      getRoomImage() || (await getCurrentRoomImage().catch(() => null));
+    if (!before || !after) {
+      document.getElementById("preview-status").textContent =
+        "Your preview is no longer available. Return to the editor.";
+      return;
     }
-
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function formatDesignName(design) {
-        const names = {
-            solid: "Solid",
-            "vertical-stripes": "Vertical Stripes",
-            "horizontal-stripes": "Horizontal Stripes",
-            grid: "Grid"
-        };
-
-        return names[design] || "Solid";
-    }
-
-    function downloadImage(imageData, filename) {
-        if (!imageData) return;
-
-        const link = document.createElement("a");
-        link.href = imageData;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-    if (beforeImage && afterImage) {
-        const roomImage = getRoomImage();
-        const paintedImage = getPaintedImage();
-
-        if (!roomImage || !paintedImage) {
-            showPreviewStatus(
-                "Preview data is missing. Please upload an image and apply a design first.",
-                "error"
-            );
-            return;
-        }
-
-        beforeImage.src = roomImage;
-        afterImage.src = paintedImage;
-
-        if (comparisonBeforeImage && comparisonAfterImage) {
-            comparisonBeforeImage.src = roomImage;
-            comparisonAfterImage.src = paintedImage;
-        }
-
-        beforeImage.onerror = function () {
-            showPreviewStatus("The original room image could not be displayed.", "error");
-        };
-
-        afterImage.onerror = function () {
-            showPreviewStatus("The painted design could not be displayed.", "error");
-        };
-    }
-
-    function updateComparison(value) {
-        const amount = Number(value);
-        if (!comparisonAfterLayer || !comparisonDivider) return;
-
-        comparisonAfterLayer.style.clipPath = `inset(0 ${100 - amount}% 0 0)`;
-        comparisonDivider.style.left = `${amount}%`;
-
-        if (comparisonValue) {
-            comparisonValue.textContent = `${amount}% After`;
-        }
-    }
-
-    if (comparisonSlider) {
-        comparisonSlider.addEventListener("input", function () {
-            updateComparison(comparisonSlider.value);
-        });
-
-        updateComparison(comparisonSlider.value);
-    }
-
-    function updatePreviewMode(mode) {
-        if (!previewContainer || !beforeCard || !afterCard) return;
-
-        previewContainer.classList.remove("show-before-only", "show-after-only");
-
-        if (mode === "before") {
-            previewContainer.classList.add("show-before-only");
-        } else if (mode === "after") {
-            previewContainer.classList.add("show-after-only");
-        }
-
-        previewModeButtons.forEach((button) => {
-            button.classList.toggle("active", button.dataset.mode === mode);
-        });
-    }
-
-    previewModeButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-            updatePreviewMode(button.dataset.mode);
-        });
+    [beforeImg, cb].forEach((i) => {
+      if (i) i.src = before;
     });
-
-    const currentMetadata = getCurrentDesignMetadata();
-
-    if (designSummary && currentMetadata) {
-        const color = escapeHtml(currentMetadata.color || "Custom");
-        const design = escapeHtml(formatDesignName(currentMetadata.design));
-        const opacity = escapeHtml(currentMetadata.opacity ?? 100);
-        const date = escapeHtml(currentMetadata.date || "Not available");
-
-        designSummary.innerHTML = `
-            <h2>Design Details</h2>
-            <div class="design-summary-grid">
-                <p><strong>Colour</strong><span>${color}</span></p>
-                <p><strong>Pattern</strong><span>${design}</span></p>
-                <p><strong>Opacity</strong><span>${opacity}%</span></p>
-                <p><strong>Created</strong><span>${date}</span></p>
-            </div>
-        `;
-    }
-
-    if (saveDesignButton) {
-        saveDesignButton.addEventListener("click", async function () {
-            const image = getPaintedImage();
-            const metadata = getCurrentDesignMetadata();
-
-            if (!image) {
-                showPreviewStatus("Apply a design before saving it.", "error");
-                return;
-            }
-
-            saveDesignButton.disabled = true;
-            saveDesignButton.querySelector(".action-text").textContent = "Saving...";
-
-            try {
-                await saveDesign({
-                    image: image,
-                    color: metadata?.color || "#ffffff",
-                    design: metadata?.design || "solid",
-                    opacity: metadata?.opacity ?? 100,
-                    date: metadata?.date || new Date().toLocaleString(),
-                    createdAt: metadata?.createdAt || new Date().toISOString()
-                });
-
-                saveDesignButton.querySelector(".action-text").textContent = "Design Saved";
-                showPreviewStatus("Design saved successfully.", "success");
-            } catch (error) {
-                console.error("Could not save design:", error);
-                saveDesignButton.disabled = false;
-                saveDesignButton.querySelector(".action-text").textContent = "Save Design";
-                showPreviewStatus(
-                    "The design could not be saved. Please try again.",
-                    "error"
-                );
-            }
-        });
-    }
-
-    if (savedDesignsContainer) {
-        loadSavedDesigns();
-
-        savedDesignSearch?.addEventListener("input", renderSavedDesigns);
-        savedDesignSort?.addEventListener("change", renderSavedDesigns);
-    }
-
-    async function loadSavedDesigns() {
-        savedDesignsContainer.innerHTML =
-            '<p class="loading-state">Loading saved designs...</p>';
-
+    [afterImg, ca].forEach((i) => {
+      if (i) i.src = after;
+    });
+    const walls = meta.walls || [],
+      summary = document.getElementById("design-summary");
+    if (summary)
+      summary.innerHTML = `
+<div class="summary-item"><span>Walls</span><strong>${walls.filter((w) => w.points?.length >= 3).length}</strong></div>
+<div class="summary-item"><span>Colours</span><strong>${new Set(walls.map((w) => w.color)).size}</strong></div>
+<div class="summary-item"><span>Patterns</span><strong>${new Set(walls.map((w) => label(w.design))).size}</strong></div>
+<div class="summary-item"><span>Updated</span><strong>${meta.updatedAt ? new Date(meta.updatedAt).toLocaleDateString() : "Today"}</strong></div>`;
+    const modes = document.querySelectorAll(".preview-mode"),
+      cards = document.getElementById("preview-container"),
+      comparison = document.getElementById("comparison-tool");
+    modes.forEach((btn) =>
+      btn.addEventListener("click", () => {
+        modes.forEach((x) => x.classList.remove("active"));
+        btn.classList.add("active");
+        const m = btn.dataset.mode;
+        cards.classList.toggle("mode-hidden", m === "comparison");
+        comparison.classList.toggle("mode-hidden", m !== "comparison");
+        if (m === "before") {
+          beforeImg.parentElement.classList.remove("mode-hidden");
+          afterImg.parentElement.classList.add("mode-hidden");
+        } else if (m === "after") {
+          beforeImg.parentElement.classList.add("mode-hidden");
+          afterImg.parentElement.classList.remove("mode-hidden");
+        } else {
+          beforeImg.parentElement.classList.remove("mode-hidden");
+          afterImg.parentElement.classList.remove("mode-hidden");
+        }
+      }),
+    );
+    const slider = document.getElementById("comparison-slider"),
+      layer = document.getElementById("comparison-after-layer"),
+      divider = document.getElementById("comparison-divider");
+    const update = (v) => {
+      if (layer) layer.style.width = `${v}%`;
+      if (divider) divider.style.left = `${v}%`;
+    };
+    slider?.addEventListener("input", (e) => update(e.target.value));
+    update(50);
+    document
+      .getElementById("download-design")
+      ?.addEventListener("click", () =>
+        download(after, `smart-paint-design-${Date.now()}.jpg`),
+      );
+    document
+      .getElementById("save-design")
+      ?.addEventListener("click", async () => {
+        const btn = document.getElementById("save-design");
+        btn.disabled = true;
+        btn.textContent = "Saving…";
         try {
-            savedDesigns = await getSavedDesigns();
-            renderSavedDesigns();
-        } catch (error) {
-            console.error("Could not load saved designs:", error);
-
-            savedDesignsContainer.innerHTML =
-                '<p class="error-state">Saved designs could not be loaded. Please refresh the page.</p>';
+          await saveDesign({
+            name: `Room Design ${new Date().toLocaleDateString()}`,
+            image: after,
+            roomImage: before,
+            metadata: meta,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+          btn.textContent = "Design Saved";
+          notify("Design saved to My Designs");
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = "Save Design";
+          }, 1500);
+        } catch (e) {
+          console.error(e);
+          btn.disabled = false;
+          btn.textContent = "Save Design";
+          notify("Could not save this design.");
         }
-    }
+      });
+  }
 
-    function getDesignTime(design) {
-        const time = Date.parse(design.createdAt || "");
-        return Number.isFinite(time) ? time : Number(design.id || 0);
-    }
+  if (page === "saved") {
+    const container = document.getElementById("saved-designs-container"),
+      search = document.getElementById("saved-design-search"),
+      sort = document.getElementById("saved-design-sort"),
+      count = document.getElementById("saved-design-count");
+    let designs = [];
+    const render = () => {
+      const q = (search?.value || "").trim().toLowerCase();
+      let list = designs.filter((d) => {
+        const walls = d.metadata?.walls || [];
+        return (
+          !q ||
+          d.name?.toLowerCase().includes(q) ||
+          walls.some((w) =>
+            `${w.color} ${label(w.design)}`.toLowerCase().includes(q),
+          )
+        );
+      });
+      if (sort?.value === "oldest")
+        list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      else if (sort?.value === "pattern")
+        list.sort((a, b) =>
+          label(a.metadata?.walls?.[0]?.design).localeCompare(
+            label(b.metadata?.walls?.[0]?.design),
+          ),
+        );
+      else
+        list.sort(
+          (a, b) =>
+            new Date(b.updatedAt || b.createdAt) -
+            new Date(a.updatedAt || a.createdAt),
+        );
+      if (count)
+        count.textContent = `${list.length} of ${designs.length} designs`;
+      if (!list.length) {
+        container.innerHTML = `<div class="card empty-state"><h2>${designs.length ? "No matching designs" : "Your design library is empty"}</h2><p>${designs.length ? "Try another colour, pattern or name." : "Save a design from the preview screen and it will appear here."}</p><a class="primary-button" href="upload.html">Create a design</a></div>`;
+        return;
+      }
+      container.innerHTML = list
+        .map((d) => {
+          const w = d.metadata?.walls?.find((x) => x.points?.length >= 3),
+            colour = w?.color || "#ddd";
+          return `<article class="card saved-card"><img class="saved-card-preview" src="${d.image}" alt="Saved room design"><div class="saved-card-body"><div class="saved-card-title"><div><h3>${escapeHtml(d.name)}</h3><span class="status-pill">${(d.metadata?.walls || []).filter((x) => x.points?.length >= 3).length} wall(s)</span></div><span class="swatch" style="background:${escapeHtml(colour)}"></span></div><div class="saved-meta"><span>${escapeHtml(label(w?.design))}</span><span>${escapeHtml(colour)}</span><span>${new Date(d.updatedAt || d.createdAt).toLocaleDateString()}</span></div><div class="saved-actions"><button class="button primary" data-open="${d.id}">Open</button><button class="button secondary" data-download="${d.id}">Download</button><button class="button secondary danger" data-delete="${d.id}">Delete</button></div></div></article>`;
+        })
+        .join("");
+      container.querySelectorAll("[data-download]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const d = designs.find((x) => x.id === Number(b.dataset.download));
+            download(d?.image, `smart-paint-design-${d.id}.jpg`);
+          }),
+      );
+      container.querySelectorAll("[data-delete]").forEach(
+        (b) =>
+          (b.onclick = async () => {
+            if (!confirm("Delete this saved design?")) return;
+            await deleteSavedDesign(b.dataset.delete);
+            designs = designs.filter((x) => x.id !== Number(b.dataset.delete));
+            render();
+            notify("Design deleted");
+          }),
+      );
+      container.querySelectorAll("[data-open]").forEach(
+        (b) =>
+          (b.onclick = async () => {
+            const d = designs.find((x) => x.id === Number(b.dataset.open));
+            if (!d) return;
+            await saveRoomImage(d.roomImage);
+            savePaintedImage(d.image);
+            saveCurrentDesignMetadata(d.metadata);
+            saveCurrentProject(d.metadata);
+            window.location.href = "preview.html";
+          }),
+      );
+    };
+    Promise.resolve()
+      .then(() => getSavedDesigns())
+      .then((data) => {
+        designs = data || [];
+        render();
+      })
+      .catch((e) => {
+        console.error(e);
+        container.innerHTML = `<div class="card error-state"><h2>Design library unavailable</h2><p>Please refresh and try again.</p></div>`;
+      });
+    search?.addEventListener("input", render);
+    sort?.addEventListener("change", render);
+  }
 
-    function renderSavedDesigns() {
-        if (!savedDesignsContainer) return;
-
-        if (!savedDesigns.length) {
-            savedDesignsContainer.innerHTML =
-                '<p class="empty-state">No saved designs yet. Create and save a wall design to see it here.</p>';
-            if (savedDesignCount) savedDesignCount.textContent = "";
-            return;
-        }
-
-        const searchTerm = (savedDesignSearch?.value || "").trim().toLowerCase();
-        const sortType = savedDesignSort?.value || "newest";
-        const filteredDesigns = savedDesigns.filter(function (design) {
-            const pattern = formatDesignName(design.design).toLowerCase();
-            const colour = String(design.color || "").toLowerCase();
-            return !searchTerm || pattern.includes(searchTerm) || colour.includes(searchTerm);
-        });
-
-        filteredDesigns.sort(function (a, b) {
-            if (sortType === "oldest") {
-                return getDesignTime(a) - getDesignTime(b);
-            }
-            if (sortType === "pattern") {
-                return formatDesignName(a.design).localeCompare(formatDesignName(b.design));
-            }
-            return getDesignTime(b) - getDesignTime(a);
-        });
-
-        if (savedDesignCount) {
-            savedDesignCount.textContent = `${filteredDesigns.length} of ${savedDesigns.length} design${savedDesigns.length === 1 ? "" : "s"}`;
-        }
-
-        if (!filteredDesigns.length) {
-            savedDesignsContainer.innerHTML =
-                '<p class="empty-state">No designs match your search.</p>';
-            return;
-        }
-
-        savedDesignsContainer.innerHTML = "";
-
-        filteredDesigns.forEach(function (design) {
-                const card = document.createElement("article");
-                card.className = "saved-design-card";
-
-                card.innerHTML = `
-                    <img
-                        class="saved-design-preview"
-                        src="${design.image}"
-                        alt="Saved wall design preview"
-                    >
-                    <div class="saved-design-info">
-                        <h3>${escapeHtml(formatDesignName(design.design))}</h3>
-                        <p class="saved-design-colour">
-                            <strong>Colour:</strong>
-                            <span class="colour-value">
-                                <span
-                                    class="colour-swatch"
-                                    style="background-color: ${escapeHtml(design.color || "#ffffff")};"
-                                    aria-hidden="true"
-                                ></span>
-                                ${escapeHtml(design.color || "Custom")}
-                            </span>
-                        </p>
-                        <p><strong>Opacity:</strong> ${escapeHtml(design.opacity ?? 100)}%</p>
-                        <p><strong>Saved:</strong> ${escapeHtml(design.date || "Unknown")}</p>
-                    </div>
-                    <div class="saved-design-actions">
-                        <button class="download-design" type="button">Download</button>
-                        <button class="delete-design" type="button">Delete</button>
-                    </div>
-                `;
-
-                const downloadButton = card.querySelector(".download-design");
-                const deleteButton = card.querySelector(".delete-design");
-
-                downloadButton.addEventListener("click", function () {
-                    downloadImage(
-                        design.image,
-                        `smart-wall-design-${design.id || "saved"}.png`
-                    );
-                });
-
-                deleteButton.addEventListener("click", async function () {
-                    const confirmed = window.confirm(
-                        "Are you sure you want to delete this saved design?"
-                    );
-
-                    if (!confirmed) return;
-
-                    deleteButton.disabled = true;
-
-                    try {
-                        await deleteSavedDesign(design.id);
-                        savedDesigns = savedDesigns.filter(item => item.id !== design.id);
-                        renderSavedDesigns();
-                    } catch (error) {
-                        console.error("Could not delete design:", error);
-                        deleteButton.disabled = false;
-                        window.alert("The design could not be deleted. Please try again.");
-                    }
-                });
-
-                savedDesignsContainer.appendChild(card);
-            });
-    }
-
-    const downloadCurrentButton = document.getElementById("download-design");
-
-    if (downloadCurrentButton) {
-        downloadCurrentButton.addEventListener("click", function () {
-            const image = getPaintedImage();
-
-            if (!image) {
-                showPreviewStatus("No painted design is available to download.", "error");
-                return;
-            }
-
-            const timestamp = new Date()
-                .toISOString()
-                .replace(/[:.]/g, "-");
-
-            downloadImage(
-                image,
-                `smart-wall-painted-design-${timestamp}.png`
-            );
-
-            showPreviewStatus("Design download started.", "success");
-        });
-    }
+  document.querySelectorAll("[data-signout]").forEach((b) =>
+    b.addEventListener("click", () => {
+      signOutLocal();
+      window.location.href = "../index.html";
+    }),
+  );
 });
-
-
-        

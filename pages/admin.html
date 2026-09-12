@@ -1,83 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-      <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/responsive.css">
-    <title>Admin Dashboard | Smart Paint</title>
-</head>
-
-<body>
-
-    <main>
-
-        <section class="admin-dashboard">
-
-            <h1>
-                Admin Dashboard
-            </h1>
-
-            <div class="kpi-container">
-
-                <article class="kpi-card">
-                    <h2>0</h2>
-                    <p>Users</p>
-                </article>
-
-                <article class="kpi-card">
-                    <h2>0</h2>
-                    <p>Images Uploaded</p>
-                </article>
-
-                <article class="kpi-card">
-                    <h2>0</h2>
-                    <p>Saved Designs</p>
-                </article>
-
-                <article class="kpi-card">
-                    <h2>0</h2>
-                    <p>Available Colours</p>
-                </article>
-
-            </div>
-
-
-            <section>
-
-                <h2>
-                    Colour Management
-                </h2>
-
-                <button type="button">
-                    Add Colour
-                </button>
-
-            </section>
-
-
-            <section>
-
-                <h2>
-                    Pattern Management
-                </h2>
-
-                <button type="button">
-                    Add Pattern
-                </button>
-
-            </section>
-
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin dashboard | Smart Paint</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-container">
+        <a class="logo" href="../index.html">
+          <span class="logo-mark"> SP </span>
+          <span class="logo-text"> Smart Paint </span>
+        </a>
+        <a class="button-link" href="../index.html"> Back to app </a>
+      </div>
+    </header>
+    <main class="page-shell">
+      <div class="container">
+        <header class="page-header">
+          <p class="eyebrow">ADMIN</p>
+          <h1 class="page-title">Product overview</h1>
+          <p class="page-description">
+            A frontend dashboard shell for managing catalogue content and
+            monitoring browser-side usage.
+          </p>
+        </header>
+        <div class="admin-grid">
+          <article class="card kpi-card">
+            <strong id="admin-design-count"> — </strong>
+            <p>Saved designs</p>
+          </article>
+          <article class="card kpi-card">
+            <strong> 8 </strong>
+            <p>Paint colours</p>
+          </article>
+          <article class="card kpi-card">
+            <strong> 4 </strong>
+            <p>Wall finishes</p>
+          </article>
+        </div>
+        <section class="card admin-section">
+          <h2>Catalogue</h2>
+          <p class="page-description">
+            The current frontend catalogue is maintained through JavaScript data
+            and can later be connected to an API/database.
+          </p>
         </section>
-
+      </div>
     </main>
-
-</body>
-
+    <script src="../js/storage.js"></script>
+    <script src="../js/admin.js"></script>
+  </body>
 </html>

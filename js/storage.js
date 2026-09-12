@@ -1,171 +1,222 @@
-// Current room image
-function saveRoomImage(imageData) {
-    sessionStorage.setItem("roomImage", imageData);
+const STORAGE_KEYS = {
+  roomImage: "roomImage",
+  paintedImage: "paintedImage",
+  metadata: "currentDesignMetadata",
+  project: "currentProject",
+  user: "smartPaintUser",
+  auth: "smartPaintAuth",
+};
+
+function setSession(key, value) {
+  sessionStorage.setItem(key, value);
+}
+function getSession(key) {
+  return sessionStorage.getItem(key);
+}
+function removeSession(key) {
+  sessionStorage.removeItem(key);
+}
+
+async function saveRoomImage(data) {
+  await saveCurrentRoomImage(data);
+
+  try {
+    setSession(STORAGE_KEYS.roomImage, data);
+  } catch (error) {
+    console.warn(
+      "Room image was saved to IndexedDB, but sessionStorage was unavailable.",
+      error,
+    );
+  }
 }
 
 function getRoomImage() {
-    return sessionStorage.getItem("roomImage");
+  return getSession(STORAGE_KEYS.roomImage);
 }
 
-function removeRoomImage() {
-    sessionStorage.removeItem("roomImage");
+async function removeRoomImage() {
+  try {
+    removeSession(STORAGE_KEYS.roomImage);
+  } catch {}
+
+  await deleteCurrentRoomImage();
 }
 
-// Current painted image
-function savePaintedImage(imageData) {
-    sessionStorage.setItem("paintedImage", imageData);
+function saveCurrentRoomImage(data) {
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const tx = db.transaction("roomImages", "readwrite");
+        const request = tx
+          .objectStore("roomImages")
+          .put({ id: "current", data });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      }),
+  );
 }
 
+function getCurrentRoomImage() {
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("roomImages", "readonly")
+          .objectStore("roomImages")
+          .get("current");
+        request.onsuccess = () => resolve(request.result?.data || null);
+        request.onerror = () => reject(request.error);
+      }),
+  );
+}
+
+function deleteCurrentRoomImage() {
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("roomImages", "readwrite")
+          .objectStore("roomImages")
+          .delete("current");
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      }),
+  );
+}
+
+function savePaintedImage(data) {
+  setSession(STORAGE_KEYS.paintedImage, data);
+}
 function getPaintedImage() {
-    return sessionStorage.getItem("paintedImage");
+  return getSession(STORAGE_KEYS.paintedImage);
 }
-
 function removePaintedImage() {
-    sessionStorage.removeItem("paintedImage");
+  removeSession(STORAGE_KEYS.paintedImage);
 }
 
-// Current design metadata
-function saveCurrentDesignMetadata(metadata) {
-    sessionStorage.setItem("currentDesignMetadata", JSON.stringify(metadata));
+function saveCurrentDesignMetadata(data) {
+  setSession(STORAGE_KEYS.metadata, JSON.stringify(data));
 }
-
 function getCurrentDesignMetadata() {
-    const data = sessionStorage.getItem("currentDesignMetadata");
-
-    if (!data) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(data);
-    } catch (error) {
-        console.error("Could not read current design metadata:", error);
-        return null;
-    }
+  try {
+    return JSON.parse(getSession(STORAGE_KEYS.metadata) || "null");
+  } catch {
+    return null;
+  }
 }
-
 function removeCurrentDesignMetadata() {
-    sessionStorage.removeItem("currentDesignMetadata");
+  removeSession(STORAGE_KEYS.metadata);
 }
 
-
-// Current wall selection
-function saveCurrentSelection(selection) {
-    sessionStorage.setItem("currentWallSelection", JSON.stringify(selection));
+function saveCurrentProject(project) {
+  setSession(STORAGE_KEYS.project, JSON.stringify(project));
+}
+function getCurrentProject() {
+  try {
+    return JSON.parse(getSession(STORAGE_KEYS.project) || "null");
+  } catch {
+    return null;
+  }
+}
+function removeCurrentProject() {
+  removeSession(STORAGE_KEYS.project);
 }
 
-function getCurrentSelection() {
-    const data = sessionStorage.getItem("currentWallSelection");
-
-    if (!data) return null;
-
-    try {
-        return JSON.parse(data);
-    } catch (error) {
-        console.error("Could not read wall selection:", error);
-        return null;
-    }
+function getAuthUser() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.user) || "null");
+  } catch {
+    return null;
+  }
+}
+function isAuthenticated() {
+  return Boolean(getSession(STORAGE_KEYS.auth));
+}
+function signInLocal(user) {
+  localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+  setSession(STORAGE_KEYS.auth, "true");
+}
+function signOutLocal() {
+  removeSession(STORAGE_KEYS.auth);
 }
 
-function removeCurrentSelection() {
-    sessionStorage.removeItem("currentWallSelection");
-}
-
-// IndexedDB for saved designs.
-// Images are too large for localStorage, so saved designs use IndexedDB.
 function openDesignDatabase() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open("SmartWallPaintDB", 1);
-
-        request.onupgradeneeded = function (event) {
-            const db = event.target.result;
-
-            if (!db.objectStoreNames.contains("designs")) {
-                db.createObjectStore("designs", {
-                    keyPath: "id",
-                    autoIncrement: true
-                });
-            }
-        };
-
-        request.onsuccess = function () {
-            resolve(request.result);
-        };
-
-        request.onerror = function () {
-            reject(request.error);
-        };
-    });
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("SmartWallPaintDB", 4);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("designs")) {
+        db.createObjectStore("designs", { keyPath: "id", autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains("roomImages")) {
+        db.createObjectStore("roomImages", { keyPath: "id" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 function saveDesign(design) {
-    return openDesignDatabase().then((db) => {
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction("designs", "readwrite");
-            const store = transaction.objectStore("designs");
-            const request = store.add(design);
-
-            request.onsuccess = function () {
-                resolve(request.result);
-            };
-
-            request.onerror = function () {
-                reject(request.error);
-            };
-        });
-    });
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const tx = db.transaction("designs", "readwrite");
+        const request = tx.objectStore("designs").add(design);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      }),
+  );
 }
-
 function getSavedDesigns() {
-    return openDesignDatabase().then((db) => {
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction("designs", "readonly");
-            const store = transaction.objectStore("designs");
-            const request = store.getAll();
-
-            request.onsuccess = function () {
-                resolve(request.result);
-            };
-
-            request.onerror = function () {
-                reject(request.error);
-            };
-        });
-    });
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("designs", "readonly")
+          .objectStore("designs")
+          .getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      }),
+  );
 }
-
+function getSavedDesign(id) {
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("designs", "readonly")
+          .objectStore("designs")
+          .get(Number(id));
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      }),
+  );
+}
 function deleteSavedDesign(id) {
-    return openDesignDatabase().then((db) => {
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction("designs", "readwrite");
-            const store = transaction.objectStore("designs");
-            const request = store.delete(id);
-
-            request.onsuccess = function () {
-                resolve();
-            };
-
-            request.onerror = function () {
-                reject(request.error);
-            };
-        });
-    });
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("designs", "readwrite")
+          .objectStore("designs")
+          .delete(Number(id));
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      }),
+  );
 }
-
-function removeSavedDesigns() {
-    return openDesignDatabase().then((db) => {
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction("designs", "readwrite");
-            const store = transaction.objectStore("designs");
-            const request = store.clear();
-
-            request.onsuccess = function () {
-                resolve();
-            };
-
-            request.onerror = function () {
-                reject(request.error);
-            };
-        });
-    });
+function updateSavedDesign(design) {
+  return openDesignDatabase().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const request = db
+          .transaction("designs", "readwrite")
+          .objectStore("designs")
+          .put(design);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      }),
+  );
 }

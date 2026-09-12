@@ -1,348 +1,183 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/responsive.css">
-
-    <title>Select Wall | Smart Paint</title>
-
-</head>
-
-<body>
-
-    <main>
-
-        <section class="wall-selection-section">
-
-            <h1>
-                Select Your Wall
-            </h1>
-
-            <p class="page-description">
-                Mark the corners of one wall, then experiment with colour, pattern, and opacity.
-            </p>
-
-            <div class="canvas-container">
-
-                <div class="editor-navigation">
-                    <a href="upload.html" class="button-link secondary-button-link">← Change Room Photo</a>
-                    <a href="saved-designs.html" class="button-link secondary-button-link">My Designs</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Room editor | Smart Paint</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-container">
+        <a class="logo" href="../index.html">
+          <span class="logo-mark"> SP </span>
+          <span class="logo-text"> Smart Paint </span>
+        </a>
+        <nav class="main-navigation">
+          <a href="../index.html"> Home </a>
+          <a href="saved-designs.html"> My Designs </a>
+        </nav>
+        <div class="header-actions">
+          <a class="button-link" href="upload.html"> New room </a>
+        </div>
+      </div>
+    </header>
+    <main class="page-shell">
+      <div class="container">
+        <div class="editor-topbar">
+          <div class="editor-breadcrumb">Visualizer / Room editor</div>
+          <div class="editor-navigation">
+            <a class="button-link" href="upload.html"> Change photo </a>
+            <a class="button-link" href="saved-designs.html"> My Designs </a>
+          </div>
+        </div>
+        <div class="editor-layout">
+          <section class="card editor-stage">
+            <div class="selection-guide">
+              <div>
+                <strong id="active-wall-label"> Wall 1 </strong>
+                <div id="selection-hint">
+                  Select a wall or start a new selection.
                 </div>
-
-                <!-- Wall Selection Tools -->
-
-                <div class="canvas-tools">
-
-                    <button
-                        type="button"
-                        id="start-selection"
-                    >
-                        Start Selection
-                    </button>
-
-                </div>
-
-
-                <!-- Selection Controls -->
-
-                <div class="selection-controls">
-
-                    <button
-                        type="button"
-                        id="undo-selection"
-                    >
-                        Undo
-                    </button>
-
-                    <button
-                        type="button"
-                        id="clear-selection"
-                    >
-                        Clear Selection
-                    </button>
-
-                    <button
-                        type="button"
-                        id="finish-selection"
-                    >
-                        Finish Selection
-                    </button>
-
-                </div>
-
-
-                <!-- Paint Controls -->
-
-                <div class="editor-panel">
-                    <div class="editor-section-title">
-                        <div>
-                            <span class="eyebrow">WALL EDITOR</span>
-                            <h2>Customize your wall</h2>
-                        </div>
-                        <span class="editor-tip">Live preview</span>
-                    </div>
-
-                    <div class="paint-controls">
-
-                    <!-- Paint Colour -->
-
-                    <label for="paint-color">
-                        Paint Colour:
-                    </label>
-
-                    <div class="color-palette">
-
-                        <span class="palette-label">
-                            Choose a colour:
-                        </span>
-
-
-                        <!-- White -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#ffffff"
-                            aria-label="White"
-                            style="background-color: #ffffff;"
-                        ></button>
-
-
-                        <!-- Cream -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#f5e6c8"
-                            aria-label="Cream"
-                            style="background-color: #f5e6c8;"
-                        ></button>
-
-
-                        <!-- Grey -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#9ca3af"
-                            aria-label="Grey"
-                            style="background-color: #9ca3af;"
-                        ></button>
-
-
-                        <!-- Light Blue -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#60a5fa"
-                            aria-label="Light Blue"
-                            style="background-color: #60a5fa;"
-                        ></button>
-
-
-                        <!-- Light Green -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#86efac"
-                            aria-label="Light Green"
-                            style="background-color: #86efac;"
-                        ></button>
-
-
-                        <!-- Pink -->
-
-                        <button
-                            type="button"
-                            class="color-option"
-                            data-color="#f9a8d4"
-                            aria-label="Pink"
-                            style="background-color: #f9a8d4;"
-                        ></button>
-
-                    </div>
-
-
-                    <!-- Custom Colour Picker -->
-
-                    <input
-                        type="color"
-                        id="paint-color"
-                        value="#4f46e5"
-                    >
-
-
-                    <!-- Design / Pattern Selection -->
-
-                    <div class="design-palette">
-
-                        <span class="palette-label">
-                            Choose a design:
-                        </span>
-
-
-                        <!-- Solid -->
-
-                        <button
-                            type="button"
-                            class="design-option active"
-                            data-design="solid"
-                        >
-                            Solid
-                        </button>
-
-
-                        <!-- Vertical Stripes -->
-
-                        <button
-                            type="button"
-                            class="design-option"
-                            data-design="vertical-stripes"
-                        >
-                            Vertical Stripes
-                        </button>
-
-
-                        <!-- Horizontal Stripes -->
-
-                        <button
-                            type="button"
-                            class="design-option"
-                            data-design="horizontal-stripes"
-                        >
-                            Horizontal Stripes
-                        </button>
-
-
-                        <!-- Grid -->
-
-                        <button
-                            type="button"
-                            class="design-option"
-                            data-design="grid"
-                        >
-                            Grid
-                        </button>
-
-                    </div>
-
-
-                    <!-- Opacity -->
-
-                    <div class="opacity-controls">
-
-                        <label for="paint-opacity">
-                            Opacity:
-                        </label>
-
-                        <input
-                            type="range"
-                            id="paint-opacity"
-                            min="10"
-                            max="100"
-                            value="70"
-                        >
-
-                        <span id="opacity-value">
-                            70%
-                        </span>
-
-                    </div>
-
-
-                    <!-- Paint Actions -->
-
-                    <div class="paint-actions">
-
-                        <button
-                            type="button"
-                            id="apply-paint"
-                        >
-                            Apply Paint
-                        </button>
-
-                        <button
-                            type="button"
-                            id="reset-paint"
-                        >
-                            Reset Paint
-                        </button>
-                        <button
-                           type="button"
-                           id="preview-design"
-                         >
-                           Preview Design
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Phase 3: Selection guidance -->
-                <div class="selection-guide" aria-live="polite">
-                    <div>
-                        <strong>How to select:</strong>
-                        <span id="selection-hint">Click Start Selection, then mark the wall corners.</span>
-                    </div>
-                    <span id="selection-point-count" class="selection-point-count">0 points</span>
-                </div>
-
-                <!-- Selection Status -->
-
-                <div>
-
-                    <p id="selection-status">
-                        Click "Start Selection" to select a wall area.
-                    </p>
-
-                </div>
-
-
-                <p class="editor-help">
-                    Tip: keep your points just inside the wall edges for a cleaner preview.
-                    The visualization preserves the room's natural brightness and shadows.
-                </p>
-
-                <!-- Wall Canvas -->
-
-                <div class="canvas-stage">
-
-                    <canvas
-                        id="wallCanvas"
-                        aria-label="Room wall selection area"
-                    >
-                    </canvas>
-
-                </div>
-
+              </div>
+              <span id="selection-point-count" class="selection-point-count">
+                0 points
+              </span>
             </div>
-
-        </section>
-
+            <div class="canvas-stage">
+              <canvas id="wallCanvas"> </canvas>
+            </div>
+            <p
+              id="selection-status"
+              class="selection-status"
+              aria-live="polite"
+            ></p>
+            <div class="selection-controls">
+              <button id="start-selection" class="button primary">
+                New wall
+              </button>
+              <button id="undo-selection" class="button secondary">
+                Undo point
+              </button>
+              <button id="clear-selection" class="button secondary">
+                Clear wall
+              </button>
+              <button id="finish-selection" class="button secondary">
+                Finish wall
+              </button>
+            </div>
+          </section>
+          <aside class="card editor-sidebar">
+            <div class="editor-section">
+              <div class="sidebar-label">Your walls</div>
+              <div id="wall-list" class="wall-list"></div>
+            </div>
+            <div class="editor-section">
+              <div class="sidebar-label">Paint colour</div>
+              <div class="color-palette">
+                <button
+                  class="color-option"
+                  data-color="#F3F1EA"
+                  style="background: #f3f1ea"
+                  aria-label="Cloud White"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#D9C7AA"
+                  style="background: #d9c7aa"
+                  aria-label="Warm Linen"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#C6A985"
+                  style="background: #c6a985"
+                  aria-label="Sandstone"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#8FA88B"
+                  style="background: #8fa88b"
+                  aria-label="Sage Leaf"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#91AFC4"
+                  style="background: #91afc4"
+                  aria-label="Misty Blue"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#B86F55"
+                  style="background: #b86f55"
+                  aria-label="Terracotta"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#42604B"
+                  style="background: #42604b"
+                  aria-label="Deep Forest"
+                ></button>
+                <button
+                  class="color-option"
+                  data-color="#41454A"
+                  style="background: #41454a"
+                  aria-label="Charcoal"
+                ></button>
+              </div>
+              <div class="custom-color">
+                <input id="paint-color" type="color" value="#8FA88B" />
+                <span> Custom colour </span>
+              </div>
+            </div>
+            <div class="editor-section">
+              <div class="sidebar-label">Finish & pattern</div>
+              <div class="design-palette">
+                <button class="design-option active" data-design="solid">
+                  Solid
+                </button>
+                <button class="design-option" data-design="vertical-stripes">
+                  Vertical stripes
+                </button>
+                <button class="design-option" data-design="horizontal-stripes">
+                  Horizontal stripes
+                </button>
+                <button class="design-option" data-design="grid">Grid</button>
+              </div>
+            </div>
+            <div class="editor-section">
+              <div class="sidebar-label">Paint strength</div>
+              <div class="range-row">
+                <input
+                  id="paint-opacity"
+                  type="range"
+                  min="10"
+                  max="100"
+                  value="70"
+                />
+                <span id="opacity-value" class="range-value"> 70% </span>
+              </div>
+            </div>
+            <div class="editor-actions">
+              <button id="apply-paint" class="button primary">
+                Apply to wall
+              </button>
+              <button id="reset-paint" class="button secondary">
+                Reset wall
+              </button>
+              <button id="preview-design" class="button primary">
+                Preview design →
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
     </main>
-
-
-    <!-- JavaScript Files -->
-
+    <div id="toast" class="toast" role="status"></div>
     <script src="../js/storage.js"></script>
     <script src="../js/colors.js"></script>
     <script src="../js/designs.js"></script>
-    <script src="../js/canvas.js"></script>
-    
-
-</body>
-
+    <script src="../js/canvas.js?v=room-fix-3"></script>
+  </body>
 </html>

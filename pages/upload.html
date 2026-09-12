@@ -1,47 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Room | Smart Wall Paint Visualizer</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/responsive.css">
-</head>
-<body>
-    <main>
-        <section class="upload-section">
-            <div class="container">
-                <h1>Upload Your Room</h1>
-                <p>Upload a clear JPG or PNG image of your room.</p>
-
-                <form id="upload-form" name="uploadForm">
-                    <label for="room-image">Choose Room Image</label>
-
-                    <div id="upload-drop-zone" class="upload-drop-zone" tabindex="0">
-                        <p><strong>Drop your room image here</strong></p>
-                        <p>or choose a file from your device</p>
-                        <input
-                            type="file"
-                            id="room-image"
-                            name="roomImage"
-                            accept="image/jpeg,image/png"
-                        >
-                    </div>
-
-                    <div id="image-preview" class="image-preview" hidden></div>
-                    <p id="upload-message" class="upload-message" role="status" aria-live="polite"></p>
-                    <p id="upload-file-info" class="upload-file-info"></p>
-
-                    <p>Upload only images that you own or have permission to use.</p>
-
-                    <button type="submit" id="upload-submit">Continue</button>
-                </form>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Upload room | Smart Paint</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-container">
+        <a class="logo" href="../index.html">
+          <span class="logo-mark"> SP </span>
+          <span class="logo-text"> Smart Paint </span>
+        </a>
+        <nav class="main-navigation">
+          <a href="../index.html"> Home </a>
+          <a href="saved-designs.html"> My Designs </a>
+        </nav>
+        <div class="header-actions">
+          <a class="button-link" href="login.html"> Sign in </a>
+        </div>
+      </div>
+    </header>
+    <main class="page-shell">
+      <div class="container">
+        <header class="page-header">
+          <p class="eyebrow">01 · START A PROJECT</p>
+          <h1 class="page-title">Upload a room photo</h1>
+          <p class="page-description">
+            Use a clear photo with the wall you want to redesign visible from a
+            straight or natural angle.
+          </p>
+        </header>
+        <section class="card upload-card">
+          <form id="upload-form">
+            <div
+              id="upload-drop-zone"
+              class="drop-zone"
+              role="button"
+              tabindex="0"
+            >
+              <div class="drop-icon">↑</div>
+              <h2>Drop your room photo here</h2>
+              <p>or click to browse from your device</p>
+              <p class="form-note">JPG or PNG · up to 5 MB</p>
+              <input
+                id="room-image"
+                class="file-input"
+                type="file"
+                accept="image/jpeg,image/png"
+              />
             </div>
+            <p id="upload-file-info" class="upload-meta"></p>
+            <img
+              id="image-preview"
+              class="upload-preview"
+              hidden
+              alt="Selected room preview"
+            />
+            <p
+              id="upload-message"
+              class="upload-message"
+              aria-live="polite"
+            ></p>
+            <div class="upload-actions">
+              <a class="button-link" href="../index.html"> Cancel </a>
+              <button id="upload-submit" class="button primary" type="submit">
+                Continue to editor
+              </button>
+            </div>
+          </form>
+          <div class="upload-tips">
+            <div class="upload-tip">
+              <strong> Good lighting </strong>
+              Avoid very dark or blurred photos.
+            </div>
+            <div class="upload-tip">
+              <strong> Clear walls </strong>
+              Keep the wall edges visible.
+            </div>
+            <div class="upload-tip">
+              <strong> One room </strong>
+              Choose a photo where the room is the main subject.
+            </div>
+          </div>
         </section>
+      </div>
     </main>
-
     <script src="../js/storage.js"></script>
     <script src="../js/upload.js"></script>
-</body>
+  </body>
 </html>

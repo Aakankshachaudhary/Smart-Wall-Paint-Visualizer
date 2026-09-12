@@ -1,37 +1,29 @@
-const paintColorInput = document.getElementById("paint-color");
-const colorButtons = document.querySelectorAll(".color-option");
-
-function setActiveColor(button) {
-    colorButtons.forEach((item) => item.classList.remove("active"));
-
-    if (button) {
-        button.classList.add("active");
-    }
+const DESIGN_OPTIONS = {
+  solid: "Solid",
+  "vertical-stripes": "Vertical Stripes",
+  "horizontal-stripes": "Horizontal Stripes",
+  grid: "Grid",
+};
+let selectedDesign = "solid";
+document.querySelectorAll(".design-option").forEach((button) =>
+  button.addEventListener("click", () => {
+    selectedDesign = button.dataset.design;
+    document
+      .querySelectorAll(".design-option")
+      .forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    document.dispatchEvent(
+      new CustomEvent("designchange", {
+        detail: {
+          design: selectedDesign,
+        },
+      }),
+    );
+  }),
+);
+function getSelectedDesign() {
+  return selectedDesign;
 }
-
-colorButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-        if (!paintColorInput) return;
-
-        paintColorInput.value = button.dataset.color;
-        setActiveColor(button);
-
-        document.dispatchEvent(
-            new CustomEvent("paintcolorchange", {
-                detail: { color: button.dataset.color }
-            })
-        );
-    });
-});
-
-if (paintColorInput) {
-    paintColorInput.addEventListener("input", function () {
-        setActiveColor(null);
-
-        document.dispatchEvent(
-            new CustomEvent("paintcolorchange", {
-                detail: { color: paintColorInput.value }
-            })
-        );
-    });
+function getDesignLabel(design) {
+  return DESIGN_OPTIONS[design] || "Solid";
 }
